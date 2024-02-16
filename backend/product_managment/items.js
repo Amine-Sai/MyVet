@@ -63,7 +63,7 @@
     const updateProduct = async (req, res) => {
         try {
             let {id} = req.params;
-            const result = await product.findOneAndUpdate({username}, req.body);
+            const result = await product.findOneAndUpdate({id}, req.body);
             
             (result === null)
                 ? res.status(404).json({msg:'product not found'})
