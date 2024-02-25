@@ -1,5 +1,5 @@
 const bcrypt = require('bcryptjs');
-const User = require('../modules/users');
+const User = require('../models/user');
 const generateToken = require('./tokengen')
 const jwt = require('jsonwebtoken')
 
@@ -13,9 +13,8 @@ const getUser = async (req, res) => {
     }
 }
 
-const createUser = async (req, res) => {
+exports.createUser = async (req, res) => {
     try {
-        const { email } = req.body;
         const user = await getUser(req, res);
         if (user) {
             res.status(400).json({msg:'User already exists!'});
@@ -32,7 +31,6 @@ const createUser = async (req, res) => {
                     lastName,
             });
             await newUser.save();
-            //redirect
             res.redirect('/login')
         }
     }
@@ -41,7 +39,7 @@ const createUser = async (req, res) => {
     }
 }
 
-const userLogin = async (req, res) => {
+exports.userLogin = async (req, res) => {
     try {
       const { email, password } = req.body;
       const user = await getUser(req, res);
@@ -55,27 +53,14 @@ const userLogin = async (req, res) => {
           return res.status(404).json({ message: 'Invalid username or password' });
         }
         // Generate the token
-        const token = jwt.sign({ id: user._id}, process.env.JWT_TOKEN, { expiresIn: '2h' });; 
+        const token = jwt.sign({ id: user._id, seller : user.seller}, process.env.JWT_TOKEN, { expiresIn: '2h' });; 
         res.redirect('/home').cookie('jwt',token,{httpOnly : true})
       }
     } catch (error) {
-  
       res.status(503).json({ msg: 'Error' });
     }
   };
-const userLogout = async (req,res) =>{
-
-    //clearCookie
-    res.cookie('jwt', 'loggedout', {
-      expires: new Date(Date.now()),
-      httpOnly: true,
-    })
+exports.userLogout = async (req,res) =>{
     res.clearCookie('jwt').redirect('/login')
 }  
   
-
-module.exports = {
-    createUser,
-    userLogin,
-    getUser
-}
