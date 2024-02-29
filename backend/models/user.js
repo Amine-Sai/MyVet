@@ -1,6 +1,5 @@
 const mongoose = require('mongoose');
 const validator = require('validator');
-const Item = require('./item');
 
 const userSchema = new mongoose.Schema({
   email: {
@@ -30,10 +29,20 @@ const userSchema = new mongoose.Schema({
     type: Date,
     default: Date(),
   },
-  items: [
+  products: [
     {
-      type: mongoose.Schema.Types.ObjectId,
-      ref: 'product',
+      pic: {
+        type : String,
+        required: true
+      },
+      name: {
+        type: String,
+        required: true
+      },
+      id: {
+        type: mongoose.Types.ObjectId,
+        required: true
+      }
     },
   ],
 });

@@ -1,6 +1,5 @@
 const bcrypt = require('bcryptjs');
 const User = require('../models/user');
-const generateToken = require('./tokengen')
 const jwt = require('jsonwebtoken')
 
 const getUser = async (req, res) => {
@@ -45,15 +44,14 @@ exports.userLogin = async (req, res) => {
       const user = await getUser(req, res);
       if (!user) {
         res.status(404).json({ msg: 'User not found!' });
-      } else 
-      {
+      } else {
         const isValidPassword = await bcrypt.compare(password, user.password);
   
         if (!isValidPassword) {
           return res.status(404).json({ message: 'Invalid username or password' });
         }
         // Generate the token
-        const token = jwt.sign({ id: user._id, seller : user.seller}, process.env.JWT_TOKEN, { expiresIn: '2h' });; 
+        const token = jwt.sign({ id: user._id, seller : user.seller}, process.env.JWT_TOKEN, { expiresIn: '2d' });; 
         res.redirect('/home').cookie('jwt',token,{httpOnly : true})
       }
     } catch (error) {

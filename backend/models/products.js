@@ -26,6 +26,16 @@ const itemSchema = new mongoose.Schema({
     default: 0,
     },
 
+    gender: {
+      type : String, 
+      enum : ["Male","Female"],
+      required : true
+    },
+    age: { 
+      type : String, 
+      enum : ["Adult","kids"],
+      required : true
+    },
     sellerid: {
         type: mongoose.Types.ObjectId,
         ref: 'User',
@@ -33,23 +43,27 @@ const itemSchema = new mongoose.Schema({
     releaseDate:
     {
         type : Date,
-        default : Date()
+        default : Date.now
     },
+    
     colors: [
         {
           sizes: [
             {
               value: { 
                 type: String, 
-                enum: ['S', 'M', 'L', 'XL', 'XXL'] 
+                enum: ['S', 'M', 'L', 'XL', 'XXL'],
+                required: true,
               },
-              inStock: Number,
-            },
-          ],
-          required: true,
+              inStock: {
+                type:Number,
+                required: true
+              },
+            }
+           ],
         },
       ],
-}
+  }
 );
 
 const Product = mongoose.model('product',itemSchema)

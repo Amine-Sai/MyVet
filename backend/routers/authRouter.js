@@ -1,6 +1,5 @@
 const router = require('express').Router();
 const { createUser, userLogin } = require('../controllers/auth');
-const cookieAuth = require('../middleware/cookieAuth');
 const {userValidator} = require('../middleware/validator')
 
 

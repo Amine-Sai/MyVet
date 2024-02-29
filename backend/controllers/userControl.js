@@ -3,7 +3,7 @@ const User = require('../models/user')
 exports.userPage = async (req, res) => {
     try {
       const { id } = req.params;
-      const user = await User.findById(id).populate('items');
+      const user = await User.findById(id);
       if (user) {
         res.status(200).json({ user });
       } else {
@@ -14,18 +14,17 @@ exports.userPage = async (req, res) => {
     }
   };
 
-
-exports.searchUser = async(req,res)=>{
+  exports.sellerSearch = async (req,res)=>{
     try {
-        const {username} = req.body
-        const users = User.find({username})
-        if (users) {
-            res.status(200).json({result: users})
+        const {firstName, lastName} = req.body
+        let seller = User.find({firstName,lastName})
+        if (seller) {
+            res.status(200).json({users_found: seller})
         } 
         else{
             res.status(404).json({msg:"user not found"})
         }
     } catch (error) {
-        res.status(500).json({msg: "error occurred."})
+        res.status(500).json({msg:"error occured"})
     }
 }
