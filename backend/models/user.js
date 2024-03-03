@@ -20,7 +20,7 @@ const userSchema = new mongoose.Schema({
     type: String,
     required: true,
   },
-  seller: {
+  isSeller: {
     type: Boolean,
     default: false,
   },
@@ -29,6 +29,7 @@ const userSchema = new mongoose.Schema({
     type: Date,
     default: Date(),
   },
+  
   products: [
     {
       pic: {

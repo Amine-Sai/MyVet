@@ -21,25 +21,23 @@ const itemSchema = new mongoose.Schema({
         required : true
     },
 
-    rating : {
-    type: Number,
-    default: 0,
-    },
-
     gender: {
       type : String, 
       enum : ["Male","Female"],
       required : true
     },
+
     age: { 
       type : String, 
       enum : ["Adult","kids"],
       required : true
     },
+
     sellerid: {
         type: mongoose.Types.ObjectId,
         ref: 'User',
     },
+
     releaseDate:
     {
         type : Date,
@@ -63,6 +61,27 @@ const itemSchema = new mongoose.Schema({
            ],
         },
       ],
+
+      comments : [
+        {
+          user : {
+          type: mongoose.Types.ObjectId,
+          ref: "User"
+          },
+          content : {
+            type: String,
+            max : 255,
+            min : 4
+          },
+          rating : {
+           type: Number,
+           required : true,
+           min: 1,
+           max : 5,
+           default: 0
+          },
+        }
+      ]
   }
 );
 

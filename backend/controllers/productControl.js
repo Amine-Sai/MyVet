@@ -1,6 +1,8 @@
 const product = require('../models/products')
 const User = require('../models/user')
+const cookie = require('../middleware/cookieAuth')
 const jwt = require('jsonwebtoken')
+require
 
 
 
@@ -82,6 +84,7 @@ exports.createProduct = async(req,res)=>{
           return false;
         }
         return product; 
+        
       };
 
     exports.updateProduct = async (req, res) => {
@@ -140,3 +143,29 @@ exports.createProduct = async(req,res)=>{
           res.status(500).json({ msg: error });
         }
       };
+      exports.addComment = async (req, res ) => {
+        try {
+          cookie.cookieAuth(req,res)
+        if (!req.user) return 
+        else {
+          product = await product.findById({_id : req.params})
+          if (!product) {
+            res.status(404).json({msg:"No such product found!"});
+            return;
+          }
+          else {
+            if (!req.body.rating) return 
+            else{ 
+              await product.comments.push({
+                user: req.user.user,
+                content : req.body.content,
+                rating : req.body.rating || 2.5
+              })
+              await product.save();
+            }
+          }
+        }
+      } catch (error) {
+        res.status(500).json({ msg: error });
+      }
+    }  
