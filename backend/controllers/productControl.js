@@ -12,8 +12,8 @@ exports.createProduct = async(req,res)=>{
     try {
         userr = jwt.verify(token,process.env.JWT_TOKEN)
         const {id , seller} = userr
-        if(!id || !seller) throw res.status(401).json({msg: "Unauthorized."})
-        else{
+        if (!id || !seller) throw res.status(401).json({msg: "Unauthorized."})
+        else {
             const {name,pic,price,category,colors} = req.body
             const newProduct = new product({
                 name: name,
@@ -58,19 +58,24 @@ exports.createProduct = async(req,res)=>{
 
     exports.searchFilter = async (req, res) => {
       try {
-        const { category, gender, age } = req.body;
+        const { category, gender, age, name } = req.body;
     
         // Initialize
-        const search = {name : req.body.name};
+        const search = {};
     
-        // Add search
+        // fiters
         if (category) search.category = category;
         if (gender) search.gender = gender;
         if (age) search.age = age;
     
-        let product = await product.find(search).select('name,pic,price');
+        // If a name is provided, find substrings within product names that match the query
+        if (name) {
+          search.name = { $regex: name, $options: 'i' };
+        }
     
-        (product) ? res.status(200).json({ product }) : res.status(404).json({ msg: "No product found." });
+        let products = await product.find(search).select('name,pic,price');
+    
+        res.status(200).json({ product });
       } catch (error) {
         res.status(500).json({ msg: "error occured" });
       }
