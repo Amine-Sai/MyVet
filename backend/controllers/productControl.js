@@ -119,9 +119,6 @@ exports.createProduct = async(req,res)=>{
         }
       };
     
-
-
-
      // deleting a product
 
      exports.delProduct = async (req, res) => {
@@ -174,3 +171,35 @@ exports.createProduct = async(req,res)=>{
         res.status(500).json({ msg: error });
       }
     }  
+
+    const moment = require('moment');
+
+exports.productRating = async (req, res) => {
+  try {
+    // Schedule the task to run every week on Sunday
+    const task = cron.schedule('* * * * Sun', async () => {
+      let products = await product.find({});
+
+      for (const product of products) {
+        // Calculate the sum of ratings and the count of ratings
+        let sumOfRatings = 0;
+        let countOfRatings = 0;
+
+        for (const comment of product.comments) {
+          sumOfRatings += comment.rating;
+          countOfRatings++;
+        }
+
+        // Calculate the average rating and round it to an integer
+        const avgRating = Math.round(sumOfRatings / countOfRatings);
+
+        // Update the product's average rating
+        product.avgRating = avgRating;
+        await product.save();
+      }
+    });
+    task.start();
+  } catch (error) {
+    res.status(500).json({ msg: error.message });
+  }
+};

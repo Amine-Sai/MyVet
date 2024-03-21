@@ -75,13 +75,20 @@ const itemSchema = new mongoose.Schema({
           },
           rating : {
            type: Number,
-           required : true,
+           required: true,
            min: 1,
            max : 5,
            default: 0
           },
         }
-      ]
+      ],
+
+      rating : {
+        type: Number,
+        default: 1,
+        min: 1,
+        max : 5,
+      }
   }
 );
 
