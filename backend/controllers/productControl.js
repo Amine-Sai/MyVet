@@ -172,7 +172,6 @@ exports.createProduct = async(req,res)=>{
       }
     }  
 
-    const moment = require('moment');
 
 exports.productRating = async (req, res) => {
   try {
