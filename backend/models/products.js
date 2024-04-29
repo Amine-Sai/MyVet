@@ -18,6 +18,7 @@ const itemSchema = new mongoose.Schema({
 
     category : {
         type: String,
+        enum : ["Shoe", "Vest", "Pants", "Accessories", "Hoodie", "T-Shirt"],   //add types if needed
         required : true
     },
 
@@ -53,6 +54,12 @@ const itemSchema = new mongoose.Schema({
                 enum: ['S', 'M', 'L', 'XL', 'XXL'],
                 required: true,
               },
+              ShoeSize: {
+                type: Number,
+                default: 0,
+                max: 45,
+              },
+
               inStock: {
                 type:Number,
                 required: true

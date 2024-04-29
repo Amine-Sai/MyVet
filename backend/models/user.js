@@ -24,7 +24,9 @@ const userSchema = new mongoose.Schema({
     type: Boolean,
     default: false,
   },
-  pic: String,
+  pic: {type: String,
+    default: '/default/pic'   // change later
+  },
   joinDate: {
     type: Date,
     default: Date(),
