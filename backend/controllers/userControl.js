@@ -22,18 +22,3 @@ exports.userRating = async (req, res) => {
     res.status(500).json({ msg: "Error occurred." }); 
   }
 }
-
-//   exports.sellerSearch = async (req,res)=>{
-//     try {
-//         const {firstName, lastName} = req.body
-//         let seller = User.find({firstName,lastName})
-//         if (seller) {
-//             res.status(200).json({users_found: seller})
-//         } 
-//         else{
-//             res.status(404).json({msg:"user not found"})
-//         }
-//     } catch (error) {
-//         res.status(500).json({msg:"error occured"})
-//     }
-// }
