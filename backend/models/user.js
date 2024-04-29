@@ -42,6 +42,10 @@ const userSchema = new mongoose.Schema({
         type: String,
         required: true
       },
+      name: {
+        type: Number,
+        required: true
+      },
       id: {
         type: mongoose.Types.ObjectId,
         required: true

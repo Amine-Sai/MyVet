@@ -52,7 +52,6 @@ const itemSchema = new mongoose.Schema({
               value: { 
                 type: String, 
                 enum: ['S', 'M', 'L', 'XL', 'XXL'],
-                required: true,
               },
               ShoeSize: {
                 type: Number,
@@ -66,6 +65,10 @@ const itemSchema = new mongoose.Schema({
               },
             }
            ],
+          color : {
+            type: String,
+            required: true,
+          } 
         },
       ],
 

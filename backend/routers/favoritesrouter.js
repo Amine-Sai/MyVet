@@ -27,8 +27,8 @@ router.post('/favorites', async (req, res) => {
             products: products.map(product => product._id)
         });
 
-        const newFavorite = await favorite.save();
-        res.status(201).json(newFavorite);
+        await favorite.save();
+        res.status(201).json(favorite);
     } catch (err) {
         res.status(400).json({ message: err.message });
     }

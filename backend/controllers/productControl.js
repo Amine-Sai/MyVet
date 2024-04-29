@@ -2,7 +2,6 @@ const product = require('../models/products')
 const User = require('../models/user')
 const cookie = require('../middleware/cookieAuth')
 const jwt = require('jsonwebtoken')
-require
 
 
 
@@ -10,11 +9,13 @@ require
 
 exports.createProduct = async(req,res)=>{
     try {
-        userr = jwt.verify(token,process.env.JWT_TOKEN)
-        const {id , seller} = userr
-        if (!id || !seller) throw res.status(401).json({msg: "Unauthorized."})
+        const {id , seller} = body.cookie.jwt
+        if (!id || !seller) { res.status(401).json({msg: "Unauthorized."});
+        return;
+         }
+
         else {
-            const {name,pic,price,category,colors} = req.body
+            const {name, pic, price, category, colors} = req.body
             const newProduct = new product({
                 name: name,
                 pic: pic,
@@ -23,11 +24,12 @@ exports.createProduct = async(req,res)=>{
                 colors: colors,
                 sellerid: id,
             })
-            await newProduct.save()
+        await newProduct.save()
         const user = await User.findById({_id : id}) 
         user.items.push({
           _id: savedProduct._id,
           pic,
+          price,
           name,
         });
         await user.save();
@@ -39,7 +41,7 @@ exports.createProduct = async(req,res)=>{
 }
 
 
-    exports.getProduct = async(req,res)=>{
+exports.getProduct = async(req,res)=>{
         try {
             let {id} = req.params
             const task = await product.findOne({_id: id})
@@ -145,6 +147,9 @@ exports.createProduct = async(req,res)=>{
           res.status(500).json({ msg: error });
         }
       };
+
+
+
       exports.addComment = async (req, res ) => {
         try {
           cookie.cookieAuth(req,res)
@@ -161,8 +166,9 @@ exports.createProduct = async(req,res)=>{
               await product.comments.push({
                 user: req.user.user,
                 content : req.body.content,
-                rating : req.body.rating || 2.5
+                rating : req.body.rating || 0
               })
+              productRating(product)
               await product.save();
             }
           }
@@ -173,32 +179,22 @@ exports.createProduct = async(req,res)=>{
     }  
 
 
-exports.productRating = async (req, res) => {
+exports.productRating = async (product) => {
   try {
     // Schedule the task to run every week on Sunday
-    const task = cron.schedule('* * * * Sun', async () => {
-      let products = await product.find({});
 
-      for (const product of products) {
-        // Calculate the sum of ratings and the count of ratings
         let sumOfRatings = 0;
-        let countOfRatings = 0;
-
-        for (const comment of product.comments) {
-          sumOfRatings += comment.rating;
-          countOfRatings++;
-        }
-
-        // Calculate the average rating and round it to an integer
+        let count = product.comments.length()
+        for (const comments of product.comments) {
+          if (comments.rating > 0) sumOfRatings += comment.rating
+        
+      }
         const avgRating = Math.round(sumOfRatings / countOfRatings);
 
-        // Update the product's average rating
-        product.avgRating = avgRating;
+        product.rating = avgRating;
         await product.save();
-      }
-    });
-    task.start();
-  } catch (error) {
+      
+      } catch (error) {
     res.status(500).json({ msg: error.message });
   }
 };
