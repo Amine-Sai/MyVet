@@ -1,16 +1,12 @@
 const product = require("../models/products");
 const User = require("../models/user");
 const cookie = require("../middleware/cookieAuth");
-const jwt = require("jsonwebtoken");
-
-// create, get, search with filter, update and delete
 
 exports.createProduct = async (req, res) => {
   try {
-    const { id, seller } = body.cookie.jwt;
-    if (!id || !seller) {
-      res.status(401).json({ msg: "Unauthorized." });
-      return;
+    const { userId, isSeller } = req;   
+    if (userId != req.params.sellerid || !isSeller) {
+      return res.status(401).json({ msg: "Unauthorized." });
     } else {
       const { name, pic, price, category, colors } = req.body;
       const newProduct = new product({
@@ -19,12 +15,12 @@ exports.createProduct = async (req, res) => {
         price: price,
         category: category,
         colors: colors,
-        sellerid: id,
+        sellerid: userId,
       });
       await newProduct.save();
-      const user = await User.findById({ _id: id });
+      const user = await User.findById({ _id: userId });
       user.items.push({
-        _id: savedProduct._id,
+        _id: newProduct._id,
         pic,
         price,
         name,
@@ -39,7 +35,7 @@ exports.createProduct = async (req, res) => {
 
 exports.getProduct = async (req, res) => {
   try {
-    let { id } = req.params;
+    const { id } = req.params;
     const task = await product.findOne({ _id: id });
     if (!task) {
       res.status(404).json({ msg: "Product unavailable" });
@@ -53,7 +49,7 @@ exports.getProduct = async (req, res) => {
 
 exports.searchFilter = async (req, res) => {
   try {
-    const { category, gender, age, name } = req.body;
+    const { category, gender, age, name } = req.query;
 
     // Initialize
     const search = {};
@@ -63,14 +59,13 @@ exports.searchFilter = async (req, res) => {
     if (gender) search.gender = gender;
     if (age) search.age = age;
 
-    // If a name is provided, find substrings within product names that match the query
     if (name) {
       search.name = { $regex: name, $options: "i" };
     }
 
-    let products = await product.find(search).select("name,pic,price");
+    let products = await product.find(search).select("name","pic","price","_id");
 
-    res.status(200).json({ product });
+    res.status(200).json({ result:  products });
   } catch (error) {
     res.status(500).json({ msg: "error occured" });
   }
@@ -173,7 +168,6 @@ exports.addComment = async (req, res) => {
     res.status(500).json({ msg: error });
   }
 };
-
 
 exports.productRating = async (product) => {
   try {

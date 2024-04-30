@@ -1,10 +1,8 @@
-const router = require('express').Router()
-const {cookieAuth } = require('../middleware/cookieAuth')
-const {userPage,userSearch} = require('../controllers/userControl')
+const router = require("express").Router();
+const userPage = require("../controllers/userControl");
 
-    // user account
-router.get('/account/:id', cookieAuth, (req, res) => userPage)
-router.post('/search', (req,res) => userSearch)
+// user account
+router.get("/account/:id", userPage);
 
-module.exports = router
-    // add user wish list and cart here @amro
+module.exports = router;
+// add user wish list and cart here @amro

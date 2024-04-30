@@ -26,11 +26,11 @@ const report = new mongoose.Schema({
         type: String,
         max : 255,
     },
-    sellerID:{
+    sellerId:{
         type : mongoose.Types.ObjectId,
         ref : 'User',
         required : true,
     },
 })
 
-module.exports = mongoose.model('report', reports);
+module.exports = mongoose.model('report', report);
