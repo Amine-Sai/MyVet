@@ -10,7 +10,7 @@ const cookieAuth = require("../middleware/cookieAuth");
 const { dataValidator } = require("../middleware/validator");
 
 // create a product
-router.post("/:sellerid", dataValidator, cookieAuth, createProduct);
+router.post("/:sellerid", cookieAuth, createProduct);
 
 // search & filter
 router.get("/search/:category&:gender&:age", (req, res) => searchFilter);

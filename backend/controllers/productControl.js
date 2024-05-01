@@ -5,30 +5,32 @@ const cookie = require("../middleware/cookieAuth");
 exports.createProduct = async (req, res) => {
   try {
     const { userId, isSeller } = req;
-    if (userId != req.params.sellerid || !isSeller) {
+    console.log(userId,req.params.sellerId);
+    if (userId != req.params.sellerid || !isSeller)
       return res.status(401).json({ msg: "Unauthorized." });
-    } else {
-      const { name, pic, price, category, colors } = req.body;
-      const newProduct = new product({
-        name: name,
-        pic: pic,
-        price: price,
-        category: category,
-        colors: colors,
-        sellerid: userId,
-      });
-      await newProduct.save();
-      const user = await User.findById({ _id: userId });
-      user.items.push({
-        _id: newProduct._id,
-        pic,
-        price,
-        name,
-      });
-      await user.save();
-      res.status(201).json({ msg: "Product created successfully." });
-    }
+    const { name, pic, price, category, colors, gender, age } = req.body;
+    const newProduct = new product({
+      name: name,
+      pic: pic,
+      price: price,
+      category: category,
+      colors: colors,
+      sellerid: userId,
+      gender: gender,
+      age: age,
+    });
+    await newProduct.save();
+    const user = await User.findById({ _id: userId });
+    user.items.push({
+      _id: newProduct._id,
+      pic,
+      price,
+      name,
+    });
+    await user.save();
+    res.status(201).json({ msg: "Product created successfully." });
   } catch (error) {
+    console.log(error);
     res.status(500).json({ msg: "error occurred." });
   }
 };

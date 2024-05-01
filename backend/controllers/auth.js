@@ -20,7 +20,7 @@ exports.createUser = async (req, res) => {
         lastName: lastName,
         products: [],
         favorites: [],
-        salt: salt
+        salt: salt,
       });
 
       await newUser.save();
@@ -36,26 +36,21 @@ exports.userLogin = async (req, res) => {
   try {
     const { email } = req.body;
     const user = await User.findOne({ email: email });
-    if (!user) {
-      return res.status(404).json({ msg: "User not found!" });
-    } else {
-      const { password } = req.body;
-      const isValidPassword = user.password == password;
-      // await bcrypt.compare(password, user.password);
-      if (!isValidPassword) {
-        return res
-          .status(404)
-          .json({ message: "Invalid username or password" });
-      }
-      // Generate the token
-      const token = jwt.sign(
-        { id: user._id, seller: user.isSeller },
-        process.env.JWT_TOKEN,
-        { expiresIn: "2d" }
-      );
-
-      res.cookie({ jwt: token }).send({ user });
+    if (!user) return res.status(404).json({ msg: "User not found!" });
+    const { password } = req.body;
+    const isValidPassword = user.password == password;
+    // await bcrypt.compare(password, user.password);
+    if (!isValidPassword) {
+      return res.status(404).json({ message: "Invalid username or password" });
     }
+    // Generate the token
+    const token = jwt.sign(
+      { id: user._id, seller: user.isSeller },
+      process.env.JWT_TOKEN,
+      { expiresIn: "2d" }
+    );
+
+    res.cookie("jwt", token).send({ user });
   } catch (error) {
     console.log(error);
     res.status(503).json({ msg: "Error" });
