@@ -6,7 +6,6 @@ const userSchema = new mongoose.Schema({
     type: String,
     unique: true,
     required: true,
-    validate: [validator.isEmail, "Enter a valid email!"],
   },
   password: {
     type: String,
@@ -75,6 +74,11 @@ const userSchema = new mongoose.Schema({
       },
     },
   ],
+  // salt : {
+  //   type : String,
+  //   default :
+  //   // required: true
+  // }
 });
 
 module.exports = mongoose.model("User", userSchema);

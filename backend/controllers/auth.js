@@ -10,37 +10,36 @@ exports.createUser = async (req, res) => {
       res.status(400).json({ msg: "User already exists!" });
     } else {
       const { password, firstName, lastName } = req.body;
-      if (password.length < 8) {
-        res.status(400).json({ msg: "Password is too short." });
-      } else {
-        const hashedPassword = await bcrypt.hash(password, process.env.SECRET);
-        const newUser = new User({
-          email: email,
-          password: hashedPassword,
-          firstName: firstName,
-          lastName: lastName,
-          products: [],
-          favorites: [],
-        });
+      const hashedPassword = password;
+      // await bcrypt.hash(password, process.env.SECRET);
+      const newUser = new User({
+        email: email,
+        password: hashedPassword,
+        firstName: firstName,
+        lastName: lastName,
+        products: [],
+        favorites: [],
+      });
 
-        await newUser.save();
-        res.redirect("/login");
-      }
+      await newUser.save();
+      res.send({ msg: "user logged in" });
     }
   } catch (error) {
-    res.status(503).json({ msg: "Error occured.",});
+    console.log(error);
+    res.status(503).json({ msg: "Error occured." });
   }
 };
 
 exports.userLogin = async (req, res) => {
   try {
-    const { password } = req.body;
-    const user = await getUser(req, res);
+    const { email } = req.body;
+    const user = await User.findOne({ email: email });
     if (!user) {
       return res.status(404).json({ msg: "User not found!" });
     } else {
-      const isValidPassword = await bcrypt.compare(password, user.password);
-
+      const { password } = req.body;
+      const isValidPassword = user.password == password;
+      // await bcrypt.compare(password, user.password);
       if (!isValidPassword) {
         return res
           .status(404)
@@ -48,17 +47,19 @@ exports.userLogin = async (req, res) => {
       }
       // Generate the token
       const token = jwt.sign(
-        { id: user._id, seller: user.seller },
+        { id: user._id, seller: user.isSeller },
         process.env.JWT_TOKEN,
         { expiresIn: "2d" }
       );
 
-      res.redirect("/home").cookie("jwt", token, { httpOnly: true }).send(user);
+      res.cookie({ jwt: token }).send({ user });
     }
   } catch (error) {
+    console.log(error);
     res.status(503).json({ msg: "Error" });
   }
 };
+
 exports.userLogout = async (req, res) => {
   res.clearCookie("jwt").redirect("/login");
 };
