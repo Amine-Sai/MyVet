@@ -1,10 +1,9 @@
 const express = require("express");
 const router = express.Router();
-const {createFavorite, unfavorite} = require("../controllers/favorites");
+const toggleFavorite = require("../controllers/favorites");
 const cookieAuth = require("../middleware/cookieAuth");
 
 // Create a new favorite list
-router.post("/favorite/product", cookieAuth, createFavorite);
-router.post("/unfavorite/product", cookieAuth, unfavorite);
+router.post("/product?:action", cookieAuth, toggleFavorite);
 
 module.exports = router;

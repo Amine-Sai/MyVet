@@ -2,19 +2,10 @@ const bcrypt = require("bcryptjs");
 const User = require("../models/user");
 const jwt = require("jsonwebtoken");
 
-const getUser = async (req, res) => {
-  try {
-    const { email } = req.body;
-    const user = await User.findOne({ email });
-    return user;
-  } catch (error) {
-    res.status(503).json({ msg: "bad request" });
-  }
-};
-
 exports.createUser = async (req, res) => {
   try {
-    const user = await getUser(req, res);
+    const { email } = req.body;
+    const user = await User.findOne({ email: email });
     if (user) {
       res.status(400).json({ msg: "User already exists!" });
     } else {
@@ -24,10 +15,12 @@ exports.createUser = async (req, res) => {
       } else {
         const hashedPassword = await bcrypt.hash(password, process.env.SECRET);
         const newUser = new User({
-          email,
+          email: email,
           password: hashedPassword,
-          firstName,
-          lastName,
+          firstName: firstName,
+          lastName: lastName,
+          products: [],
+          favorites: [],
         });
 
         await newUser.save();
@@ -35,16 +28,16 @@ exports.createUser = async (req, res) => {
       }
     }
   } catch (error) {
-    res.status(503).json({ msg: "Error", user });
+    res.status(503).json({ msg: "Error occured.",});
   }
 };
 
 exports.userLogin = async (req, res) => {
   try {
-    const { email, password } = req.body;
+    const { password } = req.body;
     const user = await getUser(req, res);
     if (!user) {
-      res.status(404).json({ msg: "User not found!" });
+      return res.status(404).json({ msg: "User not found!" });
     } else {
       const isValidPassword = await bcrypt.compare(password, user.password);
 
@@ -59,7 +52,8 @@ exports.userLogin = async (req, res) => {
         process.env.JWT_TOKEN,
         { expiresIn: "2d" }
       );
-      res.redirect("/home").cookie("jwt", token, { httpOnly: true });
+
+      res.redirect("/home").cookie("jwt", token, { httpOnly: true }).send(user);
     }
   } catch (error) {
     res.status(503).json({ msg: "Error" });

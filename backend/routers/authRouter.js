@@ -1,9 +1,10 @@
 const router = require("express").Router();
-const { createUser, userLogin } = require("../controllers/auth");
+const { createUser, userLogin, userLogout } = require("../controllers/auth");
 const { userValidator } = require("../middleware/validator");
-const errorHandlerMiddleware = require("../middleware/error-handler");
 
 router.post("/login", userLogin);
-router.post("/register", userValidator, errorHandlerMiddleware, createUser);
+router.post("/register",createUser);
+router.post("/logout", userValidator,userLogout);
+
 
 module.exports = router;

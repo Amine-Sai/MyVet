@@ -4,7 +4,7 @@ const cookie = require("../middleware/cookieAuth");
 
 exports.createProduct = async (req, res) => {
   try {
-    const { userId, isSeller } = req;   
+    const { userId, isSeller } = req;
     if (userId != req.params.sellerid || !isSeller) {
       return res.status(401).json({ msg: "Unauthorized." });
     } else {
@@ -36,11 +36,11 @@ exports.createProduct = async (req, res) => {
 exports.getProduct = async (req, res) => {
   try {
     const { id } = req.params;
-    const task = await product.findOne({ _id: id });
+    const task = await product.findById(id);
     if (!task) {
       res.status(404).json({ msg: "Product unavailable" });
     } else {
-      res.status(201).json({ task });
+      res.status(201).json({ result: task });
     }
   } catch (error) {
     res.status(500).json({ msg: "error occurred" });
@@ -63,9 +63,11 @@ exports.searchFilter = async (req, res) => {
       search.name = { $regex: name, $options: "i" };
     }
 
-    let products = await product.find(search).select("name","pic","price","_id");
+    let products = await product
+      .find(search)
+      .select("name", "pic", "price", "_id");
 
-    res.status(200).json({ result:  products });
+    res.status(200).json({ result: products });
   } catch (error) {
     res.status(500).json({ msg: "error occured" });
   }
@@ -73,70 +75,70 @@ exports.searchFilter = async (req, res) => {
 
 //updating a product
 const isSeller = async (req, res) => {
-  const product = await product.findOne({ id: req.params.id });
-  if (!product || product.sellerid !== req.user.id) {
-    return false;
-  }
+  if (!products || products.sellerid !== req.userId) return false;
+
   return product;
 };
 
 exports.updateProduct = async (req, res) => {
   try {
-    Product = await isSeller(req, res);
+    const update = req.body;
+    const userId = req.userId;
+    const productId = req.params._id;
 
-    // update product db
-    if (Product || req.body) {
-      if (req.body.pic) Product.pic = req.body.pic;
-      if (req.body.name) Product.name = req.body.name;
-      await Product.save();
-    } else
-      return res
-        .status(500)
-        .json({ err: "not authorized to edit this product" });
-
-    // update seller's page
-    const seller = await User.findById(Product.seller);
-    const itemIndex = seller.items.findIndex(
-      (item) => item._id.toString() === req.params.id
-    );
-    if (itemIndex !== -1) {
-      if (req.body.pic) seller.items[itemIndex].pic = req.body.pic;
-      if (req.body.name) seller.items[itemIndex].name = req.body.name;
-      await seller.save();
+    if (Object.keys(update).length > 0) {
+      const updated = await Product.findOneAndUpdate(
+        { _id: productId, sellerId: userId },
+        { $set: update },
+        { new: true }
+      );
+      // update in seller's page
+      if (Object.keys(updated).length > 0)
+        await User.findOneAndUpdate(
+          {
+            _id: userId,
+          },
+          {
+            $addToSet: {
+              items: {
+                pic: updated.pic,
+                price: updated.price,
+                name: updated.name,
+              },
+            },
+          }
+        );
+    } else {
+      return res.status(400).json({ msg: "please provide some changes" });
     }
-
-    res.status(201).json({ updatedProduct });
   } catch (error) {
     res.status(500).json({ msg: error });
   }
 };
 
-// deleting a product
-
 exports.delProduct = async (req, res) => {
   try {
-    Product = await isSeller(req, res);
-
-    // delete product db
-    if (Product) {
-      await Product.remove();
-    } else {
+    const deleted = await User.findOneAndDelete({
+      _id: req.params.id,
+      sellerId: req.userId,
+    });
+    if (Object.keys(deleted).length > 0)
+      await User.findOneAndUpdate(
+        {
+          _id: userId,
+        },
+        {
+          $pull: {
+            items: {
+              id: req.params.id,
+            },
+          },
+        }
+      );
+    else
       return res
         .status(500)
         .json({ err: "not authorized to delete this product" });
-    }
-
-    // delete from seller's page
-    const seller = await User.findById(Product.seller);
-    const itemIndex = seller.items.findIndex(
-      (item) => item._id.toString() === req.params.id
-    );
-    if (itemIndex !== -1) {
-      seller.items.splice(itemIndex, 1);
-      await seller.save();
-    }
-
-    res.status(204).json();
   } catch (error) {
     res.status(500).json({ msg: error });
   }

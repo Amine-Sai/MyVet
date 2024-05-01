@@ -16,13 +16,13 @@ router.post("/:sellerid", dataValidator, cookieAuth, createProduct);
 router.get("/search/:category&:gender&:age", (req, res) => searchFilter);
 
 // load product page
-router.post("/search", (req, res) => getProduct);
+router.post("/search", getProduct);
 
 //update a single product
-router.put("/product/:id", dataValidator, cookieAuth, updateProduct);
+router.put("/product/id", dataValidator, cookieAuth, updateProduct);
 
 //delete a single product
-router.delete("/product/:id", dataValidator, cookieAuth, (req, res) =>
+router.delete("/product/id", dataValidator, cookieAuth, (req, res) =>
   delProduct(req, res)
 );
 
