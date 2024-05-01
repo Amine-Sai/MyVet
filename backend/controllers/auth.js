@@ -11,7 +11,8 @@ exports.createUser = async (req, res) => {
     } else {
       const { password, firstName, lastName } = req.body;
       const hashedPassword = password;
-      // await bcrypt.hash(password, process.env.SECRET);
+      const salt = await bcrypt.genSalt(10);
+      await bcrypt.hash(password, salt);
       const newUser = new User({
         email: email,
         password: hashedPassword,
@@ -19,10 +20,11 @@ exports.createUser = async (req, res) => {
         lastName: lastName,
         products: [],
         favorites: [],
+        salt: salt
       });
 
       await newUser.save();
-      res.send({ msg: "user logged in" });
+      res.send({ msg: "user registered in" });
     }
   } catch (error) {
     console.log(error);

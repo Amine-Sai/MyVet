@@ -74,11 +74,10 @@ const userSchema = new mongoose.Schema({
       },
     },
   ],
-  // salt : {
-  //   type : String,
-  //   default :
-  //   // required: true
-  // }
+  salt : {
+    type : String,
+    required: true
+  }
 });
 
 module.exports = mongoose.model("User", userSchema);
