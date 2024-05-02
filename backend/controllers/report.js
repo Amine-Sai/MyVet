@@ -12,6 +12,8 @@ module.exports = async (req, res) => {
       sellerId: sellerId,
     })
     await Report.save()
+    // send email here too 
+
     res.status(200).json({msg: "Report sent, we\'ll respond to it as soon as we can."})
   } catch (error) {
     res

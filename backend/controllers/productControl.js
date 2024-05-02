@@ -28,6 +28,7 @@ exports.createProduct = async (req, res) => {
       price,
       name,
     });
+
     await user.save();
     res.status(201).json({ msg: "Product created successfully." });
   } catch (error) {
@@ -40,7 +41,7 @@ exports.getProduct = async (req, res) => {
   try {
     const { productId } = req.params;
     const task = await product.findById(productId);
-    
+
     if (!task) return res.status(404).json({ msg: "Product unavailable" });
     
     res.status(201).json({ result: task });
@@ -121,9 +122,10 @@ exports.updateProduct = async (req, res) => {
 
 exports.delProduct = async (req, res) => {
   try {
+    const {userId} = req
     const deleted = await User.findOneAndDelete({
       _id: req.params.productId,
-      sellerId: req.userId,
+      sellerId: userId,
     });
     if (deleted)
       await User.findOneAndUpdate(
@@ -149,26 +151,26 @@ exports.delProduct = async (req, res) => {
 
 exports.addComment = async (req, res) => {
   try {
-    cookie.cookieAuth(req, res);
-    if (!req.user) return;
+    const userId = req
+    if (!userId) return;
     else {
       product = await product.findById({ _id: req.params });
       if (!product) {
         res.status(404).json({ msg: "product not found!" });
         return;
-      } else {
-        if (!req.body.rating) return;
+      }
+        const {rating, content} = req.body
+        if (!rating) return;
         else {
           await product.comments.push({
-            user: req.user.user,
-            content: req.body.content,
-            rating: req.body.rating || 0,
+            user: userId,
+            content: content,
+            rating: rating || 0,
           });
           productRating(product);
           await product.save();
         }
       }
-    }
   } catch (error) {
     res.status(500).json({ msg: error });
   }
