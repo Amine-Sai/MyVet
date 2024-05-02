@@ -50,7 +50,7 @@ const userSchema = new mongoose.Schema({
         type: Number,
         required: true,
       },
-      id: {
+      _id: {
         type: mongoose.Types.ObjectId,
         required: true,
       },
@@ -72,7 +72,7 @@ const userSchema = new mongoose.Schema({
         required: true,
       },
 
-      id: {
+      _id: {
         type: mongoose.Types.ObjectId,
         required: true,
       },

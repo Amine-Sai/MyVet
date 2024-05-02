@@ -43,7 +43,7 @@ exports.getProduct = async (req, res) => {
     const task = await product.findById(productId);
 
     if (!task) return res.status(404).json({ msg: "Product unavailable" });
-    
+
     res.status(201).json({ result: task });
   } catch (error) {
     res.status(500).json({ msg: "error occurred" });
@@ -122,7 +122,7 @@ exports.updateProduct = async (req, res) => {
 
 exports.delProduct = async (req, res) => {
   try {
-    const {userId} = req
+    const { userId } = req;
     const deleted = await User.findOneAndDelete({
       _id: req.params.productId,
       sellerId: userId,
@@ -151,7 +151,7 @@ exports.delProduct = async (req, res) => {
 
 exports.addComment = async (req, res) => {
   try {
-    const userId = req
+    const userId = req;
     if (!userId) return;
     else {
       product = await product.findById({ _id: req.params });
@@ -159,18 +159,16 @@ exports.addComment = async (req, res) => {
         res.status(404).json({ msg: "product not found!" });
         return;
       }
-        const {rating, content} = req.body
-        if (!rating) return;
-        else {
-          await product.comments.push({
-            user: userId,
-            content: content,
-            rating: rating || 0,
-          });
-          productRating(product);
-          await product.save();
-        }
-      }
+      const { rating, content } = req.body;
+      if (!rating) return;
+      await product.comments.push({
+        user: userId,
+        content: content,
+        rating: rating || 0,
+      });
+      productRating(product);
+      await product.save();
+    }
   } catch (error) {
     res.status(500).json({ msg: error });
   }
