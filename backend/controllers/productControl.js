@@ -5,8 +5,8 @@ const cookie = require("../middleware/cookieAuth");
 exports.createProduct = async (req, res) => {
   try {
     const { userId, isSeller } = req;
-    console.log(userId,req.params.sellerId);
-    if (userId != req.params.sellerid || !isSeller)
+    console.log(userId, req.params.sellerId, isSeller);
+    if (userId != req.params.sellerId || !isSeller)
       return res.status(401).json({ msg: "Unauthorized." });
     const { name, pic, price, category, colors, gender, age } = req.body;
     const newProduct = new product({
@@ -21,8 +21,8 @@ exports.createProduct = async (req, res) => {
     });
     await newProduct.save();
     const user = await User.findById({ _id: userId });
-    user.items.push({
-      _id: newProduct._id,
+    user.products.push({
+      id: newProduct._id,
       pic,
       price,
       name,

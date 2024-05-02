@@ -9,22 +9,22 @@ exports.createUser = async (req, res) => {
     if (user) {
       res.status(400).json({ msg: "User already exists!" });
     } else {
-      const { password, firstName, lastName } = req.body;
-      const hashedPassword = password;
+      const { password, firstName, lastName, phoneNumber } = req.body;
       const salt = await bcrypt.genSalt(10);
-      await bcrypt.hash(password, salt);
+      hashedPassword = await bcrypt.hash(password, salt);
       const newUser = new User({
         email: email,
         password: hashedPassword,
         firstName: firstName,
         lastName: lastName,
+        phoneNumber: phoneNumber,
         products: [],
         favorites: [],
         salt: salt,
       });
 
       await newUser.save();
-      res.send({ msg: "user registered in" });
+      res.send({ msg: "User registered." });
     }
   } catch (error) {
     console.log(error);
@@ -38,8 +38,7 @@ exports.userLogin = async (req, res) => {
     const user = await User.findOne({ email: email });
     if (!user) return res.status(404).json({ msg: "User not found!" });
     const { password } = req.body;
-    const isValidPassword = user.password == password;
-    // await bcrypt.compare(password, user.password);
+    const isValidPassword = await bcrypt.compare(password, user.password);
     if (!isValidPassword) {
       return res.status(404).json({ message: "Invalid username or password" });
     }
@@ -49,8 +48,7 @@ exports.userLogin = async (req, res) => {
       process.env.JWT_TOKEN,
       { expiresIn: "2d" }
     );
-
-    res.cookie("jwt", token).send({ user });
+    res.cookie("jwt", token).send({ user: user  });
   } catch (error) {
     console.log(error);
     res.status(503).json({ msg: "Error" });

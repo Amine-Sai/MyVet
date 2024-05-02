@@ -31,6 +31,10 @@ const userSchema = new mongoose.Schema({
     type: Date,
     default: Date(),
   },
+  phoneNumber: {
+    type: Number,
+    required: true,
+  },
 
   products: [
     {
@@ -74,10 +78,10 @@ const userSchema = new mongoose.Schema({
       },
     },
   ],
-  salt : {
-    type : String,
+  salt: {
+    type: String,
     required: true
-  }
+  },
 });
 
 module.exports = mongoose.model("User", userSchema);
