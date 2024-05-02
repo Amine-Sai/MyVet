@@ -12,16 +12,15 @@ const cookieAuth = require("../middleware/cookieAuth");
 router.post("/:sellerId", cookieAuth, createProduct);
 
 // search & filter
-router.get("/search/:name&:category&:gender&:age", searchFilter);
+router.get("/search", searchFilter);
 
 // load product page
-router.post("/product/:productsId", getProduct);
+router.get("/product/:productId", getProduct);
 
-//update a single product 
+//update a single product
 router.put("/product/:productId", cookieAuth, updateProduct);
 
 //delete a single product
-router.delete("/product/:productId", cookieAuth, delProduct
-);
+router.delete("/product/:productId", cookieAuth, delProduct);
 
 module.exports = router;

@@ -48,7 +48,16 @@ exports.userLogin = async (req, res) => {
       process.env.JWT_TOKEN,
       { expiresIn: "2d" }
     );
-    res.cookie("jwt", token).send({ user: user  });
+
+    res.cookie("jwt", token).send({
+      user: {
+        id: user._id,
+        pic: user.pic,
+        firstName: user.firstName,
+        lastName: user.lastName,
+        email: user.email,
+      },
+    });
   } catch (error) {
     console.log(error);
     res.status(503).json({ msg: "Error" });

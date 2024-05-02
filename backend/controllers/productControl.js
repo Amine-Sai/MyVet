@@ -19,6 +19,7 @@ exports.createProduct = async (req, res) => {
       gender: gender,
       age: age,
     });
+
     await newProduct.save();
     const user = await User.findById({ _id: userId });
     user.products.push({
@@ -37,13 +38,12 @@ exports.createProduct = async (req, res) => {
 
 exports.getProduct = async (req, res) => {
   try {
-    const { id } = req.params;
-    const task = await product.findById(id);
-    if (!task) {
-      res.status(404).json({ msg: "Product unavailable" });
-    } else {
-      res.status(201).json({ result: task });
-    }
+    const { productId } = req.params;
+    const task = await product.findById(productId);
+    
+    if (!task) return res.status(404).json({ msg: "Product unavailable" });
+    
+    res.status(201).json({ result: task });
   } catch (error) {
     res.status(500).json({ msg: "error occurred" });
   }
@@ -51,51 +51,52 @@ exports.getProduct = async (req, res) => {
 
 exports.searchFilter = async (req, res) => {
   try {
-    const { category, gender, age, name } = req.query;
+    var { category, gender, age } = req.query;
+    const { name } = req.body;
 
     // Initialize
     const search = {};
-
-    // fiters
-    if (category) search.category = category;
-    if (gender) search.gender = gender;
-    if (age) search.age = age;
-
     if (name) {
-      search.name = { $regex: name, $options: "i" };
+      search.name = { $regex: `.*${name}.*`, $options: "i" };
+
+      if (category) {
+        search.category = { $regex: category, $options: "i" };
+      }
+
+      if (gender) {
+        search.gender = { $regex: gender, $options: "i" };
+      }
+
+      if (age) {
+        search.age = { $regex: age, $options: "i" };
+      }
+      console.log(search);
+      let products = await product.find(search);
+      return res.status(200).json({ result: products });
     }
-
-    let products = await product
-      .find(search)
-      .select("name", "pic", "price", "_id");
-
-    res.status(200).json({ result: products });
+    res.status(500).json({ msg: "bad request" });
   } catch (error) {
-    res.status(500).json({ msg: "error occured" });
+    console.log(error);
+    res.status(500).json({ msg: "Error occurred" });
   }
-};
-
-//updating a product
-const isSeller = async (req, res) => {
-  if (!products || products.sellerid !== req.userId) return false;
-
-  return product;
 };
 
 exports.updateProduct = async (req, res) => {
   try {
     const update = req.body;
     const userId = req.userId;
-    const productId = req.params._id;
+    const productId = req.params.productId;
 
-    if (Object.keys(update).length > 0) {
+    if (update) {
       const updated = await Product.findOneAndUpdate(
         { _id: productId, sellerId: userId },
         { $set: update },
         { new: true }
       );
+
       // update in seller's page
-      if (Object.keys(updated).length > 0)
+
+      if (updated)
         await User.findOneAndUpdate(
           {
             _id: userId,
@@ -121,10 +122,10 @@ exports.updateProduct = async (req, res) => {
 exports.delProduct = async (req, res) => {
   try {
     const deleted = await User.findOneAndDelete({
-      _id: req.params.id,
+      _id: req.params.productId,
       sellerId: req.userId,
     });
-    if (Object.keys(deleted).length > 0)
+    if (deleted)
       await User.findOneAndUpdate(
         {
           _id: userId,
