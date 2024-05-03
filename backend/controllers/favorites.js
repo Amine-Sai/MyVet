@@ -7,7 +7,7 @@ module.exports = async (req, res) => {
     const { productId } = req.params;
     const { price, pic, name } = req.body;
 
-    console.log(id,action, productId)
+    console.log(id, action, productId);
     if (!action || !id) return res.status(400).json({ msg: "Bad request" });
 
     if (action === "favorite") {
@@ -16,12 +16,12 @@ module.exports = async (req, res) => {
 
       console.log(user);
       const isFavorite = user.favorites.some(
-        (favorite) => favorite._id.toString() === productId
+        (favorite) => favorite._id.toString() == productId
       );
 
       if (!isFavorite) {
         user.favorites.push({
-          _id: new mongoose.Types.ObjectId(),
+          _id: id,
           pic,
           name,
           price,
@@ -46,6 +46,7 @@ module.exports = async (req, res) => {
       res.status(200).json({ message: "Favorite removed successfully" });
     }
   } catch (err) {
+    console.log(err);
     res.status(400).json({ msg: "Error occurred" });
   }
 };
