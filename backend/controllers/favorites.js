@@ -1,4 +1,5 @@
 const User = require("../models/user");
+const mongoose = require('mongoose')
 
 module.exports = async (req, res) => {
   try {
@@ -7,21 +8,20 @@ module.exports = async (req, res) => {
     const { productId } = req.params;
     const { price, pic, name } = req.body;
 
-    console.log(id, action, productId);
     if (!action || !id) return res.status(400).json({ msg: "Bad request" });
 
     if (action === "favorite") {
       const user = await User.findById(id);
       if (!user) return res.status(404).json({ msg: "User not found" });
 
-      console.log(user);
+      const prodId = new mongoose.Types.ObjectId(productId)      
       const isFavorite = user.favorites.some(
-        (favorite) => favorite._id.toString() == productId
-      );
+        (favorite) => favorite._id.equals(prodId)
+      )
 
       if (!isFavorite) {
         user.favorites.push({
-          _id: id,
+          _id: productId,
           pic,
           name,
           price,
