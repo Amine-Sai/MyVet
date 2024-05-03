@@ -1,6 +1,5 @@
 const product = require("../models/products");
 const User = require("../models/user");
-const cookie = require("../middleware/cookieAuth");
 
 exports.createProduct = async (req, res) => {
   try {
@@ -52,33 +51,32 @@ exports.getProduct = async (req, res) => {
 
 exports.searchFilter = async (req, res) => {
   try {
-    var { category, gender, age } = req.query;
+    var { category, gender, age, sort } = req.query;
     const { name } = req.body;
 
     // Initialize
     const search = {};
     if (name) {
       search.name = { $regex: `.*${name}.*`, $options: "i" };
-
-      if (category) {
-        search.category = { $regex: category, $options: "i" };
-      }
-
-      if (gender) {
-        search.gender = { $regex: gender, $options: "i" };
-      }
-
-      if (age) {
-        search.age = { $regex: age, $options: "i" };
-      }
-      console.log(search);
-      let products = await product.find(search);
-      return res.status(200).json({ result: products });
     }
-    res.status(500).json({ message: "bad request" });
+    if (category) {
+      search.category = { $regex: category, $options: "i" };
+    }
+
+    if (gender) {
+      search.gender = { $regex: gender, $options: "i" };
+    }
+
+    if (age) {
+      search.age = { $regex: age, $options: "i" };
+    }
+    let sortOrder = 1;
+    if ((sort = d)) sortOrder = -1;
+
+    let products = await product.find(search).sort({ price: sortOrder });
+    return res.status(200).json({ result: products });
   } catch (error) {
-    console.log(error);
-    res.status(500).json({ message: "Error occurred" });
+    res.status(500).json({ message: "Bad request" });
   }
 };
 
@@ -177,15 +175,69 @@ exports.addComment = async (req, res) => {
 exports.productRating = async (product) => {
   try {
     let sumOfRatings = 0;
-    let count = product.comments.length();
-    for (const comments of product.comments) {
-      if (comments.rating > 0) sumOfRatings += product.comment.rating;
+    const { productId } = req.body;
+    let prod = product.findById(productId);
+    let count = prod.comments.length();
+    for (const comments of prod.comments) {
+      if (comments.rating > 0) sumOfRatings += prod.comment.rating;
     }
     const avgRating = Math.round(sumOfRatings / count);
 
-    product.rating = avgRating;
+    prod.rating = avgRating;
     await product.save();
   } catch (error) {
     res.status(500).json({ message: error.message });
+  }
+};
+
+exports.homePage = async (req, res) => {
+  try {
+    const promoted = await product.find({ promotion: { $gt: 0 } }).limit(7);
+    const Shoe = await product.find({
+      category: { $regex: "shoe", $options: "i" },
+    });
+    const Pants = await product.find({
+      category: { $regex: "pants", $options: "i" },
+    });
+    const Hoodie = await product.find({
+      category: { $regex: "hoodie", $options: "i" },
+    });
+    const TShirt = await product.find({
+      category: { $regex: "T-Shirt", $options: "i" },
+    });
+    const Jacket = await product.find({
+      category: { $regex: "Jacket", $options: "i" },
+    });
+    const Sweater = await product.find({
+      category: { $regex: "Sweater", $options: "i" },
+    });
+    const Shorts = await product.find({
+      category: { $regex: "Shorts", $options: "i" },
+    });
+    const Skirt = await product.find({
+      category: { $regex: "Skirt", $options: "i" },
+    });
+    const Dress = await product.find({
+      category: { $regex: "Dress", $options: "i" },
+    });
+    const Hidjeb = await product.find({
+      category: { $regex: "Hidjeb", $options: "i" },
+    });
+
+    res.status(200).json({
+      promoted: promoted,
+      Shoe: Shoe,
+      Pants: Pants,
+      Hoodie: Hoodie,
+      TShirt: TShirt,
+      Jacket: Jacket,
+      Sweater: Sweater,
+      Shorts: Shorts,
+      Skirt: Skirt,
+      Dress: Dress,
+      Hidjeb: Hidjeb,
+    });
+  } catch (error) {
+    res.status(500).json({ message: "bad request" });
   }
 };

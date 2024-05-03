@@ -5,6 +5,7 @@ const {
   searchFilter,
   updateProduct,
   delProduct,
+  homePage
 } = require("../controllers/productControl");
 const cookieAuth = require("../middleware/cookieAuth");
 
@@ -22,5 +23,12 @@ router.put("/product/:productId", cookieAuth, updateProduct);
 
 //delete a single product
 router.delete("/product/:productId", cookieAuth, delProduct);
+
+
+// home page
+router.get("/homepage", homePage)
+
+// home page for flutter app
+router.get("/home",searchFilter)
 
 module.exports = router;
