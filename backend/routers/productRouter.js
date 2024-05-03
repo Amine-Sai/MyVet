@@ -5,7 +5,7 @@ const {
   searchFilter,
   updateProduct,
   delProduct,
-  homePage
+  homePage,
 } = require("../controllers/productControl");
 const cookieAuth = require("../middleware/cookieAuth");
 
@@ -13,7 +13,7 @@ const cookieAuth = require("../middleware/cookieAuth");
 router.post("/:sellerId", cookieAuth, createProduct);
 
 // search & filter
-router.get("/search", searchFilter);
+router.get("/search/", searchFilter);
 
 // load product page
 router.get("/product/:productId", getProduct);
@@ -24,11 +24,10 @@ router.put("/product/:productId", cookieAuth, updateProduct);
 //delete a single product
 router.delete("/product/:productId", cookieAuth, delProduct);
 
-
 // home page
-router.get("/homepage", homePage)
+router.get("/homepage", homePage);
 
 // home page for flutter app
-router.get("/home",searchFilter)
+router.get("/home", searchFilter);
 
 module.exports = router;

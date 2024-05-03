@@ -4,7 +4,6 @@ const User = require("../models/user");
 exports.createProduct = async (req, res) => {
   try {
     const { userId, isSeller } = req;
-    console.log(userId, req.params.sellerId, isSeller);
     if (userId != req.params.sellerId || !isSeller)
       return res.status(401).json({ message: "Unauthorized." });
     const { name, pic, price, category, colors, gender, age } = req.body;
@@ -51,9 +50,7 @@ exports.getProduct = async (req, res) => {
 
 exports.searchFilter = async (req, res) => {
   try {
-    var { category, gender, age, sort } = req.query;
-    const { name } = req.body;
-
+    const { category, gender, age, sort, name } = req.query;
     // Initialize
     const search = {};
     if (name) {
@@ -71,10 +68,15 @@ exports.searchFilter = async (req, res) => {
       search.age = { $regex: age, $options: "i" };
     }
     let sortOrder = 1;
-    if ((sort = d)) sortOrder = -1;
+    if (sort == "d") sortOrder = -1;
 
+    console.log(search);
     let products = await product.find(search).sort({ price: sortOrder });
-    return res.status(200).json({ result: products });
+    console.log(products);
+
+    if (!products)
+      return res.status(404).json({ message: "No products found." });
+    res.status(200).json({ result: products });
   } catch (error) {
     res.status(500).json({ message: "Bad request" });
   }
