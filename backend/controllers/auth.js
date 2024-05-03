@@ -50,7 +50,7 @@ exports.userLogin = async (req, res) => {
       { expiresIn: "2d" }
     );
 
-    res.status(200).send({
+    res.status(200).json({
       jwt: token,
       user: {
         id: user._id,
