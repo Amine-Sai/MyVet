@@ -1,9 +1,10 @@
 const admin = require("../models/admin");
 const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
+const Product = require("../models/products");
 
 
-exports.createUser = async (req, res) => {
+exports.createAdmin = async (req, res) => {
     try {
       const { email } = req.body;
       const user = await admin.findOne({ email: email });
@@ -28,3 +29,50 @@ exports.createUser = async (req, res) => {
       res.status(503).json({ message: "Error occured." });
     }
   };
+
+
+  exports.updateProduct = async (req, res) => {
+    try {
+      const update = req.body;
+      const userId = req.userId;
+      const productId = req.params.productId;
+  
+      if (update) {
+        const updated = await Product.findOneAndUpdate(
+          { _id: productId, sellerId: userId },
+          { $set: update },
+          { new: true }
+        );
+  
+        if (updated)
+          await User.findOneAndUpdate(
+            {
+              _id: userId,
+            },
+            {
+              $addToSet: {
+                items: {
+                  pic: updated.pic,
+                  price: updated.price,
+                  name: updated.name,
+                },
+              },
+            }
+          );
+      } else {
+        return res.status(400).json({ message: "please provide some changes" });
+      }
+    } catch (error) {
+      res.status(500).json({ message: error });
+    }
+  };  
+
+exports.deleteProduct = async (req,res) =>{
+  try {
+    const {productId} = req.params
+    await Product.findOneAndDelete(productId)
+    res.status(201).json({message: "Product deleted successfully"})
+  } catch (error) {
+    res.status(500).json({message: "Error occured"})
+  }
+}
