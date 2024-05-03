@@ -7,7 +7,7 @@ exports.createProduct = async (req, res) => {
     const { userId, isSeller } = req;
     console.log(userId, req.params.sellerId, isSeller);
     if (userId != req.params.sellerId || !isSeller)
-      return res.status(401).json({ msg: "Unauthorized." });
+      return res.status(401).json({ message: "Unauthorized." });
     const { name, pic, price, category, colors, gender, age } = req.body;
     const newProduct = new product({
       name: name,
@@ -30,10 +30,10 @@ exports.createProduct = async (req, res) => {
     });
 
     await user.save();
-    res.status(201).json({ msg: "Product created successfully." });
+    res.status(201).json({ message: "Product created successfully." });
   } catch (error) {
     console.log(error);
-    res.status(500).json({ msg: "error occurred." });
+    res.status(500).json({ message: "error occurred." });
   }
 };
 
@@ -42,11 +42,11 @@ exports.getProduct = async (req, res) => {
     const { productId } = req.params;
     const task = await product.findById(productId);
 
-    if (!task) return res.status(404).json({ msg: "Product unavailable" });
+    if (!task) return res.status(404).json({ message: "Product unavailable" });
 
     res.status(201).json({ result: task });
   } catch (error) {
-    res.status(500).json({ msg: "error occurred" });
+    res.status(500).json({ message: "error occurred" });
   }
 };
 
@@ -75,10 +75,10 @@ exports.searchFilter = async (req, res) => {
       let products = await product.find(search);
       return res.status(200).json({ result: products });
     }
-    res.status(500).json({ msg: "bad request" });
+    res.status(500).json({ message: "bad request" });
   } catch (error) {
     console.log(error);
-    res.status(500).json({ msg: "Error occurred" });
+    res.status(500).json({ message: "Error occurred" });
   }
 };
 
@@ -113,10 +113,10 @@ exports.updateProduct = async (req, res) => {
           }
         );
     } else {
-      return res.status(400).json({ msg: "please provide some changes" });
+      return res.status(400).json({ message: "please provide some changes" });
     }
   } catch (error) {
-    res.status(500).json({ msg: error });
+    res.status(500).json({ message: error });
   }
 };
 
@@ -145,7 +145,7 @@ exports.delProduct = async (req, res) => {
         .status(500)
         .json({ err: "not authorized to delete this product" });
   } catch (error) {
-    res.status(500).json({ msg: error });
+    res.status(500).json({ message: error });
   }
 };
 
@@ -156,7 +156,7 @@ exports.addComment = async (req, res) => {
     else {
       product = await product.findById({ _id: req.params });
       if (!product) {
-        res.status(404).json({ msg: "product not found!" });
+        res.status(404).json({ message: "product not found!" });
         return;
       }
       const { rating, content } = req.body;
@@ -170,7 +170,7 @@ exports.addComment = async (req, res) => {
       await product.save();
     }
   } catch (error) {
-    res.status(500).json({ msg: error });
+    res.status(500).json({ message: error });
   }
 };
 
@@ -186,6 +186,6 @@ exports.productRating = async (product) => {
     product.rating = avgRating;
     await product.save();
   } catch (error) {
-    res.status(500).json({ msg: error.message });
+    res.status(500).json({ message: error.message });
   }
 };

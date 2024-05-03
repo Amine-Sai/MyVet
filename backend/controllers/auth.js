@@ -7,7 +7,7 @@ exports.createUser = async (req, res) => {
     const { email } = req.body;
     const user = await User.findOne({ email: email });
     if (user) {
-      res.status(400).json({ msg: "User already exists!" });
+      res.status(400).json({ message: "User already exists!" });
     } else {
       const { password, firstName, lastName, phoneNumber } = req.body;
       const salt = await bcrypt.genSalt(10);
@@ -24,11 +24,11 @@ exports.createUser = async (req, res) => {
       });
 
       await newUser.save();
-      res.send({ msg: "User registered." });
+      res.send({ message: "User registered." });
     }
   } catch (error) {
     console.log(error);
-    res.status(503).json({ msg: "Error occured." });
+    res.status(503).json({ message: "Error occured." });
   }
 };
 
@@ -36,7 +36,7 @@ exports.userLogin = async (req, res) => {
   try {
     const { email } = req.body;
     const user = await User.findOne({ email: email });
-    if (!user) return res.status(404).json({ msg: "User not found!" });
+    if (!user) return res.status(404).json({ message: "User not found!" });
     const { password } = req.body;
     const isValidPassword = await bcrypt.compare(password, user.password);
     if (!isValidPassword) {
@@ -50,7 +50,8 @@ exports.userLogin = async (req, res) => {
       { expiresIn: "2d" }
     );
 
-    res.cookie("jwt", token).send({
+    res.status(200).send({
+      jwt: token,
       user: {
         id: user._id,
         pic: user.pic,
@@ -62,7 +63,7 @@ exports.userLogin = async (req, res) => {
     });
   } catch (error) {
     console.log(error);
-    res.status(503).json({ msg: "Error" });
+    res.status(503).json({ message: "Error" });
   }
 };
 

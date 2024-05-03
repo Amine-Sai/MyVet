@@ -1,23 +1,23 @@
 const User = require("../models/user");
-const mongoose = require('mongoose')
+const mongoose = require("mongoose");
 
-module.exports = async (req, res) => {
+exports.toggleFavorite = async (req, res) => {
   try {
     const id = req.userId;
     const { action } = req.query;
     const { productId } = req.params;
     const { price, pic, name } = req.body;
 
-    if (!action || !id) return res.status(400).json({ msg: "Bad request" });
+    if (!action || !id) return res.status(400).json({ message: "Bad request" });
 
-    if (action === "favorite") {
+    if (action == "favorite") {
       const user = await User.findById(id);
-      if (!user) return res.status(404).json({ msg: "User not found" });
+      if (!user) return res.status(404).json({ message: "User not found" });
 
-      const prodId = new mongoose.Types.ObjectId(productId)      
-      const isFavorite = user.favorites.some(
-        (favorite) => favorite._id.equals(prodId)
-      )
+      const prodId = new mongoose.Types.ObjectId(productId);
+      const isFavorite = user.favorites.some((favorite) =>
+        favorite._id.equals(prodId)
+      );
 
       if (!isFavorite) {
         user.favorites.push({
@@ -26,14 +26,13 @@ module.exports = async (req, res) => {
           name,
           price,
         });
-        console.log(user);
 
         await user.save();
-        res.status(201).json({ msg: `${name} is now in your favorites` });
+        res.status(201).json({ message: `${name} is now in your favorites` });
       } else {
         return res
           .status(400)
-          .json({ msg: "Product already in your favorites" });
+          .json({ message: "Product already in your favorites" });
       }
     } else {
       await User.findByIdAndUpdate(id, {
@@ -47,6 +46,13 @@ module.exports = async (req, res) => {
     }
   } catch (err) {
     console.log(err);
-    res.status(400).json({ msg: "Error occurred" });
+    res.status(400).json({ message: "Error occurred" });
   }
+};
+
+exports.getFavorites = async (req, res) => {
+  const userId = req.userId;
+  const user = await User.findById(userId);
+  if (!user) return res.status(404).json({ message: "User not found." });
+  res.status(200).send(user.favorites);
 };
