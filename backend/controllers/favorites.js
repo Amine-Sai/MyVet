@@ -51,8 +51,8 @@ exports.toggleFavorite = async (req, res) => {
 };
 
 exports.getFavorites = async (req, res) => {
-  const userId = req.userId;ص
+  const userId = req.userId;
   const user = await User.findById(userId);
   if (!user) return res.status(404).json({ message: "User not found." });
-  res.status(200).send(user.favorites);
+  res.status(200).send({ favorites: user.favorites });
 };
