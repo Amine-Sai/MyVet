@@ -42,7 +42,7 @@ exports.userLogin = async (req, res) => {
     if (!isValidPassword) {
       return res.status(404).json({ message: "Invalid username or password" });
     }
-    
+
     // Generate the token
     const token = jwt.sign(
       { id: user._id, seller: user.isSeller },
@@ -57,6 +57,7 @@ exports.userLogin = async (req, res) => {
         firstName: user.firstName,
         lastName: user.lastName,
         email: user.email,
+        isSeller: user.isSeller,
       },
     });
   } catch (error) {

@@ -179,7 +179,7 @@ exports.productRating = async (product) => {
     let sumOfRatings = 0;
     let count = product.comments.length();
     for (const comments of product.comments) {
-      if (comments.rating > 0) sumOfRatings += comment.rating;
+      if (comments.rating > 0) sumOfRatings += product.comment.rating;
     }
     const avgRating = Math.round(sumOfRatings / count);
 
