@@ -80,6 +80,11 @@ const userSchema = new mongoose.Schema({
     type: String,
     required: true
   },
+
+  upgradeRequest: {
+    type: Boolean,
+    default : true
+  }
 });
 
 module.exports = mongoose.model("User", userSchema);
