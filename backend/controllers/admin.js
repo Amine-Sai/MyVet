@@ -81,6 +81,7 @@ exports.deleteUser = async (req,res) =>{
     const userId = req.params
     const user = await User.findOneAndDelete({_id : userId})
     if(!user) return res.status(404).json({msg: "User not found"})
+    await Product.deleteMany({sellerId : user._id})
     res.status(200).json({message: "user deleted"})
 
   } catch (error) {

@@ -1,3 +1,4 @@
+const Product = require("../models/products");
 const product = require("../models/products");
 const User = require("../models/user");
 
@@ -38,13 +39,21 @@ exports.createProduct = async (req, res) => {
 exports.getProduct = async (req, res) => {
   try {
     const { productId } = req.params;
-    const task = await product.findById(productId);
+    const product = await Product.findById(productId);
 
-    if (!task) return res.status(404).json({ message: "Product unavailable" });
+    if (!product) return res.status(404).json({ message: "Product unavailable" });
 
-    res.status(201).json({ result: task });
+    let heart = false;
+    if (req.userId) {
+      const user = await User.findOne({
+        _id: product.sellerid,
+        favorites: { $elemMatch: { _id: mongoose.Types.ObjectId(productId) } }, });
+      if (user) heart = true;
+    }
+
+    res.status(200).json({ result: product, isFavorite: heart });
   } catch (error) {
-    res.status(500).json({ message: "error occurred" });
+    res.status(500).json({ message: "Error occurred" });
   }
 };
 
@@ -70,9 +79,9 @@ exports.searchFilter = async (req, res) => {
     let sortOrder = 1;
     if (sort == "d") sortOrder = -1;
 
-    console.log(search);
+    if(!search) return
+    
     let products = await product.find(search).sort({ price: sortOrder });
-    console.log(products);
 
     if (!products)
       return res.status(404).json({ message: "No products found." });
@@ -123,10 +132,11 @@ exports.updateProduct = async (req, res) => {
 exports.delProduct = async (req, res) => {
   try {
     const { userId } = req;
-    const deleted = await User.findOneAndDelete({
+    const deleted = await Product.findOneAndDelete({
       _id: req.params.productId,
       sellerId: userId,
     });
+
     if (deleted)
       await User.findOneAndUpdate(
         {
