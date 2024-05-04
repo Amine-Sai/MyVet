@@ -1,7 +1,6 @@
 const admin = require("../models/admin");
 const User = require("../models/user");
 const bcrypt = require("bcryptjs");
-const jwt = require("jsonwebtoken");
 const Product = require("../models/products");
 
 exports.createAdmin = async (req, res) => {
@@ -68,24 +67,30 @@ exports.updateProduct = async (req, res) => {
 exports.deleteProduct = async (req, res) => {
   try {
     const { productId } = req.params;
-    await Product.findOneAndDelete(productId);
+    const product = await Product.findOneAndDelete(productId);
+    await User.updateOne(
+      { _id: product.sellerid },
+      {
+        $pullAll: {
+          favorites: [{ _id: mongoose.Types.ObjectId(productId) }],
+          products: [{ _id: mongoose.Types.ObjectId(productId) }],
+        },
+      }
+    );
     res.status(201).json({ message: "Product deleted successfully" });
   } catch (error) {
     res.status(500).json({ message: "Error occured" });
   }
 };
 
-
-exports.deleteUser = async (req,res) =>{
+exports.deleteUser = async (req, res) => {
   try {
-    const userId = req.params
-    const user = await User.findOneAndDelete({_id : userId})
-    if(!user) return res.status(404).json({msg: "User not found"})
-    await Product.deleteMany({sellerId : user._id})
-    res.status(200).json({message: "user deleted"})
-
+    const userId = req.params;
+    const user = await User.findOneAndDelete({ _id: userId });
+    if (!user) return res.status(404).json({ msg: "User not found" });
+    await Product.deleteMany({ sellerId: user._id });
+    res.status(200).json({ message: "user deleted" });
   } catch (error) {
-    res.status(500).json({message : "Error occured"})
+    res.status(500).json({ message: "Error occured" });
   }
-
-}
+};

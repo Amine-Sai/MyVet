@@ -41,13 +41,15 @@ exports.getProduct = async (req, res) => {
     const { productId } = req.params;
     const product = await Product.findById(productId);
 
-    if (!product) return res.status(404).json({ message: "Product unavailable" });
+    if (!product)
+      return res.status(404).json({ message: "Product unavailable" });
 
     let heart = false;
     if (req.userId) {
       const user = await User.findOne({
         _id: product.sellerid,
-        favorites: { $elemMatch: { _id: mongoose.Types.ObjectId(productId) } }, });
+        favorites: { $elemMatch: { _id: mongoose.Types.ObjectId(productId) } },
+      });
       if (user) heart = true;
     }
 
@@ -79,8 +81,8 @@ exports.searchFilter = async (req, res) => {
     let sortOrder = 1;
     if (sort == "d") sortOrder = -1;
 
-    if(!search) return
-    
+    if (!search) return;
+
     let products = await product.find(search).sort({ price: sortOrder });
 
     if (!products)
@@ -93,39 +95,38 @@ exports.searchFilter = async (req, res) => {
 
 exports.updateProduct = async (req, res) => {
   try {
+    const { userId } = req;
+    const { productId } = req.params;
     const update = req.body;
-    const userId = req.userId;
-    const productId = req.params.productId;
 
-    if (update) {
-      const updated = await Product.findOneAndUpdate(
-        { _id: productId, sellerId: userId },
-        { $set: update },
-        { new: true }
-      );
-
-      // update in seller's page
-
-      if (updated)
-        await User.findOneAndUpdate(
-          {
-            _id: userId,
-          },
-          {
-            $addToSet: {
-              items: {
-                pic: updated.pic,
-                price: updated.price,
-                name: updated.name,
-              },
-            },
-          }
-        );
-    } else {
-      return res.status(400).json({ message: "please provide some changes" });
+    if (!update) {
+      return res.status(400).json({ message: "Please provide some changes" });
     }
+
+    const updatedProduct = await Product.findOneAndUpdate(
+      { _id: productId, sellerId: userId },
+      { $set: update },
+      { new: true }
+    );
+
+    if (!updatedProduct) {
+      return res.status(404).json({ message: "Product not found" });
+    }
+
+    await User.updateOne(
+      { _id: userId, "products._id": productId },
+      {
+        $set: {
+          "products.$.pic": updatedProduct.pic,
+          "products.$.price": updatedProduct.price,
+          "products.$.name": updatedProduct.name,
+        },
+      }
+    );
+
+    res.status(200).json({ message: "Product updated successfully" });
   } catch (error) {
-    res.status(500).json({ message: error });
+    res.status(500).json({ message: error.message });
   }
 };
 
@@ -138,15 +139,12 @@ exports.delProduct = async (req, res) => {
     });
 
     if (deleted)
-      await User.findOneAndUpdate(
+      await User.updateOne(
+        { _id: product.sellerid },
         {
-          _id: userId,
-        },
-        {
-          $pull: {
-            items: {
-              id: req.params.id,
-            },
+          $pullAll: {
+            favorites: [{ _id: mongoose.Types.ObjectId(productId) }],
+            products: [{ _id: mongoose.Types.ObjectId(productId) }],
           },
         }
       );
