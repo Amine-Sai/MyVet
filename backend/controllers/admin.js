@@ -2,6 +2,7 @@ const admin = require("../models/admin");
 const User = require("../models/user");
 const bcrypt = require("bcryptjs");
 const Product = require("../models/products");
+const admin = require("../models/admin");
 
 exports.createAdmin = async (req, res) => {
   try {
@@ -26,6 +27,37 @@ exports.createAdmin = async (req, res) => {
   } catch (error) {
     console.log(error);
     res.status(503).json({ message: "Error occured." });
+  }
+};
+exports.adminLogin = async (req, res) => {
+  try {
+    const { email } = req.body;
+    const admin = await admin.findOne({ email: email });
+    if (!admin) return res.status(404).json({ message: "Admin not found!" });
+    const { password } = req.body;
+    const isValidPassword = await bcrypt.compare(password, admin.password);
+    if (!isValidPassword) {
+      return res.status(404).json({ message: "Invalid username or password" });
+    }
+
+    // Generate the token
+    const token = jwt.sign(
+      { id: admin._id, seller: admin.isSeller },
+      process.env.JWT_TOKEN,
+      { expiresIn: "2d" }
+    );
+
+    res.status(200).json({
+      jwt: token,
+      admin: {
+        id: admin._id,
+        username: admin.username,
+        email: admin.email,
+      },
+    });
+  } catch (error) {
+    console.log(error);
+    res.status(503).json({ message: "Error" });
   }
 };
 
@@ -92,5 +124,41 @@ exports.deleteUser = async (req, res) => {
     res.status(200).json({ message: "user deleted" });
   } catch (error) {
     res.status(500).json({ message: "Error occured" });
+  }
+};
+
+// array of the products, i get another array of edit which is an object
+
+// products = [{_id,name,pic,price}] ||  edits [{indice: integer, change : newProduct'd Id }]
+
+exports.editHome = async (req, res) => {
+  try {
+    const { products, edit } = req.body;
+    for (let i = 0; i < edit.length(); i++) {
+      let prod = await Product.findById(edit[i].change);
+      if (!prod) continue;
+      let newProduct = {
+        _id: prod._id,
+        name: prod.name,
+        pic: prod.pic,
+        price: prod.price,
+      };
+      products[edit[i].indice] = newProduct;
+    }
+  } catch (error) {
+    res.status(500).json({ message: "Error occured" });
+  }
+};
+
+exports.upgradeToSeller = async (req, res) => {
+  try {
+    const { userId } = req.params;
+    let user = await User.findOneAndUpdate(userId, {
+      $set: (isSeller = true),
+    });
+    if (!user) return res.status(404).json({ message: "User not found." });
+    res.status(200).json({ message: "User upgraded to seller" });
+  } catch (error) {
+    res.status(500).json({message: "Error occured"})
   }
 };

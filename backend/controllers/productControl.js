@@ -213,7 +213,7 @@ exports.homePage = async (req, res) => {
       category: { $regex: "hoodie", $options: "i" },
     });
     const TShirt = await product.find({
-      category: { $regex: "T-Shirt", $options: "i" },
+      category: { $regex: "TShirt", $options: "i" },
     });
     const Jacket = await product.find({
       category: { $regex: "Jacket", $options: "i" },

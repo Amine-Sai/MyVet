@@ -1,6 +1,5 @@
 const jwt = require("jsonwebtoken");
 
-
 module.exports = (req, res, next) => {
   const token = req.headers.jwt;
 
@@ -11,8 +10,7 @@ module.exports = (req, res, next) => {
 
     // exp check
     if (decodedToken.exp <= Date.now() / 1000) {
-      res.clearCookie("jwt");
-      return res.redirect("/login");
+      return res.sendStatus(401).end();
     }
 
     req.userId = decodedToken.id;

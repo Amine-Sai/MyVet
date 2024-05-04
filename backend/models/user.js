@@ -83,7 +83,7 @@ const userSchema = new mongoose.Schema({
 
   upgradeRequest: {
     type: Boolean,
-    default : true
+    default : false
   }
 });
 

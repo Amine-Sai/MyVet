@@ -13,7 +13,7 @@ module.exports = async (req, res) => {
     });
     await Report.save();
     // send email here too
-
+      
     res
       .status(200)
       .json({ message: "Report sent, we'll respond to it as soon as we can." });
