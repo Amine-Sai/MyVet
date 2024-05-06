@@ -1,31 +1,31 @@
 const bcrypt = require("bcryptjs");
 const User = require("../models/user");
 const jwt = require("jsonwebtoken");
+const Math = require("mathjs");
+const nodemailer = require("nodemailer");
 
 exports.createUser = async (req, res) => {
   try {
     const { email } = req.body;
     const user = await User.findOne({ email: email });
-    if (user) {
-      res.status(400).json({ message: "User already exists!" });
-    } else {
-      const { password, firstName, lastName, phoneNumber } = req.body;
-      const salt = await bcrypt.genSalt(10);
-      hashedPassword = await bcrypt.hash(password, salt);
-      const newUser = new User({
-        email: email,
-        password: hashedPassword,
-        firstName: firstName,
-        lastName: lastName,
-        phoneNumber: phoneNumber,
-        products: [],
-        favorites: [],
-        salt: salt,
-      });
+    if (user) return res.status(400).json({ message: "User already exists!" });
+    const { password, firstName, lastName, phoneNumber } = req.body;
+    const salt = await bcrypt.genSalt(10);
+    hashedPassword = await bcrypt.hash(password, salt);
 
-      await newUser.save();
-      res.send({ message: "User registered." });
-    }
+    const newUser = new User({
+      email: email,
+      password: hashedPassword,
+      firstName: firstName,
+      lastName: lastName,
+      phoneNumber: phoneNumber,
+      products: [],
+      favorites: [],
+      salt: salt,
+    });
+
+    await newUser.save();
+    res.send({ message: "User registered." });
   } catch (error) {
     console.log(error);
     res.status(503).json({ message: "Error occured." });
@@ -66,7 +66,84 @@ exports.userLogin = async (req, res) => {
     res.status(503).json({ message: "Error" });
   }
 };
+// password reset
+const emailVerification = async (email, code) => {
+  const transporterr = nodemailer.createTransport({
+    service: "Gmail",
+    auth: {
+      user: `${process.env.ADMIN_EMAIL}`,
+      pass: `${process.env.password}`, // Your password
+    },
+  });
+
+  const mailOptions = {
+    from: `${process.env.ADMIN_EMAIL}`,
+    to: email,
+    subject: "Reset password",
+    text: `Your verification code is: ${code}`,
+  };
+
+  transporterr.sendMail(mailOptions, (error, info) => {
+    if (error) {
+      console.log(error);
+    } else {
+      console.log("Email sent: " + info.response);
+    }
+  });
+};
+
+const generateOTP = () => {
+  return ("" + Math.random()).substring(2, 7);
+};
+
+exports.passResetEmail = async (req, res) => {
+  try {
+    const { email } = req.body;
+    const user = await User.findOne({ email: email });
+    if (!user) return res.status(404).json({ message: "User not found." });
+
+    if (
+      user.resetPassword.attempts < 4 &&
+      user.resetPassword.cooldown >= Date.now()
+    ) {
+      user.resetPassword.attempts++;
+      const resetToken = generateOTP();
+      user.resetPassword.string = resetToken;
+      user.resetPassword.expiresIn = Date.now() + 30 * 60 * 1000; // 30 minute timeout
+      await emailVerification(email, resetToken);
+    } else if (user.resetPassword.attempts == 4) {
+      user.resetPassword.cooldown = Date.now() + 5 * 60 * 1000; // 5 minute cooldown
+    }
+    await user.save();
+    res.json({ message: "Password reset email sent." });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ message: "Error sending password reset email." });
+  }
+};
+
+exports.resetPassword = async (req, res) => {
+  try {
+    const { token, password } = req.body;
+    const user = await User.findOne({ "resetPassword.string": token });
+    if (!user || user.resetPassword.expiresAt > Date.now())
+      return res.status(404).json({ message: "Invalid reset token" });
+
+    if (user.resetPassword.expiresIn < Date.now()) {
+      return res.status(400).json({ message: "Reset token has expired." });
+    }
+
+    const hashedPassword = await bcrypt.hash(password, user.salt);
+    user.password = hashedPassword;
+    user.resetPassword.attempts = 0;
+    await user.save();
+    res.status(200).json({ message: "Password reset successfully." });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ message: "Error resetting password." });
+  }
+};
 
 exports.userLogout = async (req, res) => {
-  res.clearCookie("jwt").redirect("/login");
+  res.status(204).json({ jwt: "" });
 };

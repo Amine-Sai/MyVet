@@ -13,8 +13,7 @@ const favoritesRouter = require("./routers/favoritesrouter");
 const reportRouter = require("./routers/reportRouter");
 
 const app = express();
-const PORT = process.env.PORT;
-// || 3000;
+const PORT = process.env.PORT || 3000;
 
 app.use(cookieParser());
 app.use(bodyParser.json());

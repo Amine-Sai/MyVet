@@ -3,7 +3,10 @@ const jwt = require("jsonwebtoken");
 module.exports = (req, res, next) => {
   const token = req.headers.jwt;
 
-  if (!token) return res.redirect("/login");
+  if (!token) {
+    end();
+    return res.status(401).json({message: "Login Required."});
+  }
 
   try {
     const decodedToken = jwt.verify(token, process.env.JWT_TOKEN);

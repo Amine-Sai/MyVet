@@ -13,6 +13,21 @@ exports.userPage = async (req, res) => {
   }
 };
 
+exports.myArticles = async (req, res) => {
+  try {
+    const { userId } = req.header;
+    const user = await User.findById(userId);
+    if (!user) return res.status(404).json({ message: "Page not found." });
+    if (!user.isSeller)
+      return res
+        .status(404)
+        .json({ message: "Upgrade to seller to get this feature." });
+    res.status(200).json({ articles: user.products });
+  } catch (error) {
+    res.status(500).json({ message: "Error occurred." });
+  }
+};
+
 exports.upgradeRequest = async (req, res) => {
   try {
     const { userId } = req;

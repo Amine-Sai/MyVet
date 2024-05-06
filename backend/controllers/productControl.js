@@ -202,39 +202,69 @@ exports.productRating = async (product) => {
 
 exports.homePage = async (req, res) => {
   try {
-    const promoted = await product.find({ promotion: { $gt: 0 } }).limit(7);
-    const Shoe = await product.find({
-      category: { $regex: "shoe", $options: "i" },
-    });
-    const Pants = await product.find({
-      category: { $regex: "pants", $options: "i" },
-    });
-    const Hoodie = await product.find({
-      category: { $regex: "hoodie", $options: "i" },
-    });
-    const TShirt = await product.find({
-      category: { $regex: "TShirt", $options: "i" },
-    });
-    const Jacket = await product.find({
-      category: { $regex: "Jacket", $options: "i" },
-    });
-    const Sweater = await product.find({
-      category: { $regex: "Sweater", $options: "i" },
-    });
-    const Shorts = await product.find({
-      category: { $regex: "Shorts", $options: "i" },
-    });
-    const Skirt = await product.find({
-      category: { $regex: "Skirt", $options: "i" },
-    });
-    const Dress = await product.find({
-      category: { $regex: "Dress", $options: "i" },
-    });
-    const Hidjeb = await product.find({
-      category: { $regex: "Hidjeb", $options: "i" },
-    });
 
+    // hard coded incoming !!
+
+    const mostSold = await product.find({})
+    .sort({ sold: 1 })
+    .limit(7);
+
+    const promoted = await product
+      .find({ promotion: { $gt: 0 } })
+      .sort({ sold: 1 })
+      .limit(7);
+    const Shoe = await product
+      .find({
+        category: { $regex: "shoe", $options: "i" },
+      })
+      .sort({ sold: 1 });
+    const Pants = await product
+      .find({
+        category: { $regex: "pants", $options: "i" },
+      })
+      .sort({ sold: 1 });
+    const Hoodie = await product
+      .find({
+        category: { $regex: "hoodie", $options: "i" },
+      })
+      .sort({ sold: 1 });
+    const TShirt = await product
+      .find({
+        category: { $regex: "TShirt", $options: "i" },
+      })
+      .sort({ sold: 1 });
+    const Jacket = await product
+      .find({
+        category: { $regex: "Jacket", $options: "i" },
+      })
+      .sort({ sold: 1 });
+    const Sweater = await product
+      .find({
+        category: { $regex: "Sweater", $options: "i" },
+      })
+      .sort({ sold: 1 });
+    const Shorts = await product
+      .find({
+        category: { $regex: "Shorts", $options: "i" },
+      })
+      .sort({ sold: 1 });
+    const Skirt = await product
+      .find({
+        category: { $regex: "Skirt", $options: "i" },
+      })
+      .sort({ sold: 1 });
+    const Dress = await product
+      .find({
+        category: { $regex: "Dress", $options: "i" },
+      })
+      .sort({ sold: 1 });
+    const Hidjeb = await product
+      .find({
+        category: { $regex: "Hidjeb", $options: "i" },
+      })
+      .sort({ sold: 1 });
     res.status(200).json({
+      mostSold: mostSold,
       promoted: promoted,
       Shoe: Shoe,
       Pants: Pants,

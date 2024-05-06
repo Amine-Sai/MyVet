@@ -157,8 +157,10 @@ exports.upgradeToSeller = async (req, res) => {
       $set: (isSeller = true),
     });
     if (!user) return res.status(404).json({ message: "User not found." });
-    res.status(200).json({ message: "User upgraded to seller" });
+    res
+      .status(200)
+      .json({ message: "User upgraded to seller", loggedIn: false });
   } catch (error) {
-    res.status(500).json({message: "Error occured"})
+    res.status(500).json({ message: "Error occured" });
   }
 };

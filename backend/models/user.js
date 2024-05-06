@@ -27,7 +27,7 @@ const userSchema = new mongoose.Schema({
   },
   joinDate: {
     type: Date,
-    default: Date(),
+    default: Date.now(),
   },
   phoneNumber: {
     type: String,
@@ -78,13 +78,33 @@ const userSchema = new mongoose.Schema({
   ],
   salt: {
     type: String,
-    required: true
+    required: true,
   },
 
   upgradeRequest: {
     type: Boolean,
-    default : false
+    default: false,
+  },
+
+  resetPassword: {
+    string : {type: String,
+    default : "b69be89d982eed865b7bb9cdc5d18b671fc6e7601cd"+ Date.now()},
+    attempts : {
+      type : Number,
+      default:3
+    },
+    cooldown : {
+      type: Date,
+      default: Date.now()
+    },
+    expiresIn: {
+      type: Date,
+      default: Date.now()
+    }
+    
+
   }
+  
 });
 
 module.exports = mongoose.model("User", userSchema);
