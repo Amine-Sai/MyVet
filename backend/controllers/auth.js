@@ -45,7 +45,7 @@ exports.userLogin = async (req, res) => {
 
     // Generate the token
     const token = jwt.sign(
-      { id: user._id, seller: user.isSeller },
+      { id: user._id},
       process.env.JWT_TOKEN,
       { expiresIn: "2d" }
     );
@@ -58,7 +58,7 @@ exports.userLogin = async (req, res) => {
         firstName: user.firstName,
         lastName: user.lastName,
         email: user.email,
-        isSeller: user.isSeller,
+        // isSeller: user.isSeller,
       },
     });
   } catch (error) {

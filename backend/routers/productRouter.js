@@ -16,7 +16,7 @@ router.post("/:sellerId", cookieAuth, createProduct);
 router.get("/search/", searchFilter);
 
 // load product page
-router.get("/product/:productId", getProduct);
+router.get("/product/:productId",getProduct);
 
 //update a single product
 router.put("/product/:productId", cookieAuth, updateProduct);

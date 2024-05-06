@@ -4,8 +4,11 @@ const User = require("../models/user");
 
 exports.createProduct = async (req, res) => {
   try {
-    const { userId, isSeller } = req;
-    if (userId != req.params.sellerId || !isSeller)
+    const { userId } = req;
+    if (userId != req.params.sellerId)
+      return res.status(401).json({ message: "Unauthorized." });
+    const user = await User.findById({ _id: userId });
+    if (!user || user.isSeller == false)
       return res.status(401).json({ message: "Unauthorized." });
     const { name, pic, price, category, colors, gender, age } = req.body;
     const newProduct = new product({
@@ -20,7 +23,6 @@ exports.createProduct = async (req, res) => {
     });
 
     await newProduct.save();
-    const user = await User.findById({ _id: userId });
     user.products.push({
       id: newProduct._id,
       pic,
@@ -45,14 +47,13 @@ exports.getProduct = async (req, res) => {
       return res.status(404).json({ message: "Product unavailable" });
 
     let heart = false;
-    if (req.userId) {
-      const user = await User.findOne({
+    let user = null;
+    if (req.userId)
+      user = await User.findOne({
         _id: product.sellerid,
         favorites: { $elemMatch: { _id: mongoose.Types.ObjectId(productId) } },
       });
-      if (user) heart = true;
-    }
-
+    if (user) heart = true;
     res.status(200).json({ result: product, isFavorite: heart });
   } catch (error) {
     res.status(500).json({ message: "Error occurred" });
@@ -202,12 +203,9 @@ exports.productRating = async (product) => {
 
 exports.homePage = async (req, res) => {
   try {
-
     // hard coded incoming !!
 
-    const mostSold = await product.find({})
-    .sort({ sold: 1 })
-    .limit(7);
+    const mostSold = await product.find({}).sort({ sold: 1 }).limit(7);
 
     const promoted = await product
       .find({ promotion: { $gt: 0 } })

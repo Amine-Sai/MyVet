@@ -15,15 +15,13 @@ exports.userPage = async (req, res) => {
 
 exports.myArticles = async (req, res) => {
   try {
-    const { userId } = req.header;
-    const user = await User.findById(userId);
+    if (!req.userId) return res.status(401).json({ message: "Unauthorized." });
+    const user = await User.findById(req.userId);
     if (!user) return res.status(404).json({ message: "Page not found." });
-    if (!user.isSeller)
-      return res
-        .status(404)
-        .json({ message: "Upgrade to seller to get this feature." });
-    res.status(200).json({ articles: user.products });
+    if (!user.isSeller) return res.status(404).json({ message: "Upgrade to seller to get this feature." });
+    res.json({ data: user.products, message: "Articles retrieved." });
   } catch (error) {
+    console.log(error);
     res.status(500).json({ message: "Error occurred." });
   }
 };

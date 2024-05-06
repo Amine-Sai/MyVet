@@ -5,7 +5,7 @@ module.exports = (req, res, next) => {
 
   if (!token) {
     end();
-    return res.status(401).json({message: "Login Required."});
+    return res.status(401).json({ message: "Login Required." });
   }
 
   try {
@@ -15,13 +15,9 @@ module.exports = (req, res, next) => {
     if (decodedToken.exp <= Date.now() / 1000) {
       return res.sendStatus(401).end();
     }
-
     req.userId = decodedToken.id;
-    req.isSeller = decodedToken.seller;
-
     next();
   } catch (err) {
-    res.clearCookie("jwt");
-    return;
+    return res.sendStatus(401).end();
   }
 };
