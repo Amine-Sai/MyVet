@@ -79,7 +79,7 @@ const emailVerification = async (email, code) => {
   });
 
   const mailOptions = {
-    from: `${process.env.ADMIN_EMAIL}`,
+    from: "aa.denai@esi-sba.dz",
     to: email,
     subject: "Reset password",
     text: `Your verification code is: ${code}`,
