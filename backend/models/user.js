@@ -93,7 +93,7 @@ const userSchema = new mongoose.Schema({
     },
     attempts: {
       type: Number,
-      default: 3,
+      default: 0,
     },
     cooldown: {
       type: Date,

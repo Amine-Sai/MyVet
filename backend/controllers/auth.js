@@ -64,13 +64,17 @@ exports.userLogin = async (req, res) => {
     res.status(503).json({ message: "Error" });
   }
 };
+const generateOTP = () => {
+  return ("" + Math.random()).substring(2, 7);
+};
+
 // password reset
 const emailVerification = async (email, code) => {
   const transporterr = nodemailer.createTransport({
     service: "Gmail",
     auth: {
-      user: `${process.env.ADMIN_EMAIL}`,
-      pass: `${process.env.password}`, // Your password
+      user: `${process.env.ADMIN_EMAIL}`, //admin email
+      pass: `${process.env.PASSWORD}`, // admin pass
     },
   });
 
@@ -80,7 +84,6 @@ const emailVerification = async (email, code) => {
     subject: "Reset password",
     text: `Your verification code is: ${code}`,
   };
-
   transporterr.sendMail(mailOptions, (error, info) => {
     if (error) {
       console.log(error);
@@ -90,26 +93,25 @@ const emailVerification = async (email, code) => {
   });
 };
 
-const generateOTP = () => {
-  return ("" + Math.random()).substring(2, 7);
-};
-
 exports.passResetEmail = async (req, res) => {
   try {
     const { email } = req.body;
     const user = await User.findOne({ email: email });
     if (!user) return res.status(404).json({ message: "User not found." });
-
+    console.log(user.resetPassword.attempts);
     if (
-      user.resetPassword.attempts < 4 &&
-      user.resetPassword.cooldown >= Date.now()
+      user.resetPassword.attempts < 4 ||
+      user.resetPassword.cooldown <= Date.now()
     ) {
       user.resetPassword.attempts++;
+      console.log("can reset this time");
       const resetToken = generateOTP();
       user.resetPassword.string = resetToken;
+      console.log("can reset this time", resetToken);
       user.resetPassword.expiresIn = Date.now() + 30 * 60 * 1000; // 30 minute timeout
       await emailVerification(email, resetToken);
-    } else if (user.resetPassword.attempts == 4) {
+    } else if (user.resetPassword.attempts >= 4) {
+      console.log("can't reset this time");
       user.resetPassword.cooldown = Date.now() + 5 * 60 * 1000; // 5 minute cooldown
     }
     await user.save();

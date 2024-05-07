@@ -18,7 +18,6 @@ exports.toggleFavorite = async (req, res) => {
     const isFavorite = user.favorites.some(
       (favorite) => favorite.id == productId
     );
-    console.log(isFavorite);
     if (!isFavorite) {
       user.favorites.push({
         id: productId,
@@ -26,7 +25,6 @@ exports.toggleFavorite = async (req, res) => {
         name: product.name,
         price: product.price * (1 - product.promotion),
       });
-      console.log(productId, product.name);
       res.status(201).json({
         message: `${product.name} is now in your favorites`,
       });

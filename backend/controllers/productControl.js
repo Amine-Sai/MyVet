@@ -5,9 +5,9 @@ const mongoose = require("mongoose");
 
 exports.createProduct = async (req, res) => {
   try {
-    const { userId } = req;
-    if (userId != req.params.sellerId)
+    if (!req.params.sellerId)
       return res.status(401).json({ message: "Unauthorized." });
+    const { userId } = req;
     const user = await User.findById({ _id: userId });
     if (!user || user.isSeller == false)
       return res.status(401).json({ message: "Unauthorized." });
@@ -25,10 +25,10 @@ exports.createProduct = async (req, res) => {
 
     await newProduct.save();
     user.products.push({
-      id: newProduct._id,
-      pic,
-      price,
-      name,
+      _id: newProduct._id,
+      name: name,
+      pic: pic[0],
+      price: price,
     });
 
     await user.save();

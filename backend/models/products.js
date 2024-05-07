@@ -42,7 +42,7 @@ const itemSchema = new mongoose.Schema({
 
   age: {
     type: String,
-    enum: ["Adult", "kids"],
+    enum: ["Adult", "Kids"],
     required: true,
   },
 
@@ -62,9 +62,10 @@ const itemSchema = new mongoose.Schema({
         {
           value: {
             type: String,
-            enum: ["S", "M", "L", "XL", "XXL"],
+            enum: ["", "S", "M", "L", "XL", "XXL"],
+            default: "",
           },
-          ShoeSize: {
+          shoeSize: {
             type: Number,
             default: 0,
             max: 45,
@@ -73,6 +74,7 @@ const itemSchema = new mongoose.Schema({
           inStock: {
             type: Number,
             required: true,
+            default: 1,
           },
         },
       ],

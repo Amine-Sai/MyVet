@@ -3,6 +3,49 @@ const User = require("../models/user");
 const bcrypt = require("bcryptjs");
 const Product = require("../models/products");
 const admin = require("../models/admin");
+const Math = require("mathjs");
+
+const emailVerification = async (email, code) => {
+  const transporterr = nodemailer.createTransport({
+    service: "Gmail",
+    auth: {
+      user: `${process.env.ADMIN_EMAIL}`,
+      pass: `${process.env.password}`, // Your password
+    },
+  });
+
+  const mailOptions = {
+    from: `${process.env.ADMIN_EMAIL}`,
+    to: email,
+    subject: "Reset password",
+    text: `Your verification code is: ${code}`,
+  };
+
+  transporterr.sendMail(mailOptions, (error, info) => {
+    if (error) {
+      console.log(error);
+    } else {
+      console.log("Email sent: " + info.response);
+    }
+  });
+};
+
+const generateOTP = () => {
+  return ("" + Math.random()).substring(2, 7);
+};
+
+exports.newAdmin = async (req, res) => {
+  try {
+    const { email } = req.body;
+    const user = await admin.findOne({ email: email });
+    if (user) return res.status(400).json({ message: "User already exists!" });
+    const code = generateOTP();
+    await emailVerification(email, code);
+    res.status(200).json({ message: "Email sent!" });
+  } catch (error) {
+    res.status(500).json({ message: "Error occured" });
+  }
+};
 
 exports.createAdmin = async (req, res) => {
   try {
@@ -74,20 +117,15 @@ exports.updateProduct = async (req, res) => {
       );
       const userId = updated.sellerId;
       if (updated)
-        await User.findOneAndUpdate(
-          {
-            _id: userId,
-          },
-          {
-            $addToSet: {
-              items: {
-                pic: updated.pic,
-                price: updated.price,
-                name: updated.name,
-              },
+        await User.findByIdAndUpdate(userId, {
+          $addToSet: {
+            items: {
+              pic: updated.pic,
+              price: updated.price,
+              name: updated.name,
             },
-          }
-        );
+          },
+        });
     } else {
       return res.status(400).json({ message: "please provide some changes" });
     }
@@ -99,16 +137,15 @@ exports.updateProduct = async (req, res) => {
 exports.deleteProduct = async (req, res) => {
   try {
     const { productId } = req.params;
-    const product = await Product.findOneAndDelete(productId);
-    await User.updateOne(
-      { _id: product.sellerid },
-      {
-        $pullAll: {
-          favorites: [{ _id: mongoose.Types.ObjectId(productId) }],
-          products: [{ _id: mongoose.Types.ObjectId(productId) }],
-        },
-      }
-    );
+    const product = await Product.findByIdAndDelete(productId);
+    if (!product)
+      return res.status(404).json({ message: "Product not found." });
+    await User.findByIdAndUpdate(product.sellerid, {
+      $pullAll: {
+        favorites: [{ id: productId }],
+        products: [{ _id: productId }],
+      },
+    });
     res.status(201).json({ message: "Product deleted successfully" });
   } catch (error) {
     res.status(500).json({ message: "Error occured" });
@@ -118,7 +155,7 @@ exports.deleteProduct = async (req, res) => {
 exports.deleteUser = async (req, res) => {
   try {
     const userId = req.params;
-    const user = await User.findOneAndDelete({ _id: userId });
+    const user = await User.findByIdAndDelete(userId);
     if (!user) return res.status(404).json({ msg: "User not found" });
     await Product.deleteMany({ sellerId: user._id });
     res.status(200).json({ message: "user deleted" });
@@ -157,9 +194,7 @@ exports.upgradeToSeller = async (req, res) => {
       $set: (isSeller = true),
     });
     if (!user) return res.status(404).json({ message: "User not found." });
-    res
-      .status(200)
-      .json({ message: "User upgraded to seller", loggedIn: false });
+    res.status(200).json({ message: "User upgraded to seller" });
   } catch (error) {
     res.status(500).json({ message: "Error occured" });
   }

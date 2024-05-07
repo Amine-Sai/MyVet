@@ -1,23 +1,23 @@
 const jwt = require("jsonwebtoken");
-
-module.exports = (req, res, next) => {
-  const token = req.headers.jwt;
-
-  if (!token) {
-    end();
+const Math = require("mathjs");
+module.exports = async (req, res, next) => {
+  if (!req.headers.jwt) {
     return res.status(401).json({ message: "Login Required." });
   }
 
+  const token = req.headers.jwt;
   try {
     const decodedToken = jwt.verify(token, process.env.JWT_TOKEN);
 
-    // exp check
-    if (decodedToken.exp <= Date.now() / 1000) {
-      return res.sendStatus(401).end();
+    // Check if token has expired
+    if (decodedToken.exp <= Math.floor(Date.now() / 1000)) {
+      return res.status(401).json({ message: "Token has expired." });
     }
+
     req.userId = decodedToken.id;
     next();
   } catch (err) {
-    return res.sendStatus(401).end();
+    console.error(err); // Log error for debugging
+    return res.status(401).json({ message: "Invalid token." });
   }
 };
