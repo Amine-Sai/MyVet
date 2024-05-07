@@ -1,5 +1,5 @@
+const { prod } = require("mathjs");
 const Product = require("../models/products");
-const product = require("../models/products");
 const User = require("../models/user");
 const mongoose = require("mongoose");
 
@@ -12,7 +12,7 @@ exports.createProduct = async (req, res) => {
     if (!user || user.isSeller == false)
       return res.status(401).json({ message: "Unauthorized." });
     const { name, pic, price, category, colors, gender, age } = req.body;
-    const newProduct = new product({
+    const newProduct = new Product({
       name: name,
       pic: pic,
       price: price,
@@ -86,9 +86,9 @@ exports.searchFilter = async (req, res) => {
 
     if (!search) return;
 
-    let products = await product.find(search).sort({ price: sortOrder });
-
-    if (!products)
+    let products = await Product.find(search).sort({ price: sortOrder });
+    console.log(products);
+    if (products.length == 0)
       return res.status(404).json({ message: "No products found." });
     res.status(200).json({ result: products });
   } catch (error) {
@@ -102,12 +102,14 @@ exports.updateProduct = async (req, res) => {
     const { productId } = req.params;
     const update = req.body;
 
+    //  console.log(update);
+
     if (!update) {
       return res.status(400).json({ message: "Please provide some changes" });
     }
 
-    const updatedProduct = await Product.findOneAndUpdate(
-      { _id: productId, sellerId: userId },
+    let updatedProduct = await Product.findOneAndUpdate(
+      { _id: productId, sellerid: userId },
       { $set: update },
       { new: true }
     );
@@ -116,20 +118,26 @@ exports.updateProduct = async (req, res) => {
       return res.status(404).json({ message: "Product not found" });
     }
 
-    await User.updateOne(
-      { _id: userId, "products._id": productId },
-      {
-        $set: {
-          "products.$.pic": updatedProduct.pic,
-          "products.$.price": updatedProduct.price,
-          "products.$.name": updatedProduct.name,
-        },
-      }
-    );
+    let user = await User.findById(userId);
+    if (!user) return console.log("cookie issues bud");
+    let arr = user.products;
 
+    for (let prod in arr) {
+      if (prod._id == updatedProduct._id) {
+        prod.name = updatedProduct.name;
+        prod.price = updatedProduct.price;
+        prod.pic = updatedProduct.pic[0];
+      }
+    }
+
+    console.log(user);
+
+    await updatedProduct.save();
+    await user.save();
     res.status(200).json({ message: "Product updated successfully" });
   } catch (error) {
-    res.status(500).json({ message: error.message });
+    console.log(error);
+    res.status(500).json({ message: "Error Occured." });
   }
 };
 
@@ -143,11 +151,11 @@ exports.delProduct = async (req, res) => {
 
     if (deleted)
       await User.updateOne(
-        { _id: product.sellerid },
+        { _id: deleted.sellerid },
         {
           $pullAll: {
-            favorites: [{ _id: mongoose.Types.ObjectId(productId) }],
-            products: [{ _id: mongoose.Types.ObjectId(productId) }],
+            favorites: [{ id: productId }],
+            products: [{ _id: productId }],
           },
         }
       );
@@ -165,14 +173,14 @@ exports.addComment = async (req, res) => {
     const userId = req;
     if (!userId) return;
     else {
-      product = await product.findById({ _id: req.params });
+      let product = await Product.findById({ _id: req.params });
       if (!product) {
         res.status(404).json({ message: "product not found!" });
         return;
       }
       const { rating, content } = req.body;
       if (!rating) return;
-      await product.comments.push({
+      product.comments.push({
         user: userId,
         content: content,
         rating: rating || 0,
@@ -189,7 +197,7 @@ exports.productRating = async (product) => {
   try {
     let sumOfRatings = 0;
     const { productId } = req.body;
-    let prod = product.findById(productId);
+    let prod = Product.findById(productId);
     let count = prod.comments.length();
     for (const comments of prod.comments) {
       if (comments.rating > 0) sumOfRatings += prod.comment.rating;
@@ -213,56 +221,36 @@ exports.homePage = async (req, res) => {
       .find({ promotion: { $gt: 0 } })
       .sort({ sold: 1 })
       .limit(7);
-    const Shoe = await product
-      .find({
-        category: { $regex: "shoe", $options: "i" },
-      })
-      .sort({ sold: 1 });
-    const Pants = await product
-      .find({
-        category: { $regex: "pants", $options: "i" },
-      })
-      .sort({ sold: 1 });
-    const Hoodie = await product
-      .find({
-        category: { $regex: "hoodie", $options: "i" },
-      })
-      .sort({ sold: 1 });
-    const TShirt = await product
-      .find({
-        category: { $regex: "TShirt", $options: "i" },
-      })
-      .sort({ sold: 1 });
-    const Jacket = await product
-      .find({
-        category: { $regex: "Jacket", $options: "i" },
-      })
-      .sort({ sold: 1 });
-    const Sweater = await product
-      .find({
-        category: { $regex: "Sweater", $options: "i" },
-      })
-      .sort({ sold: 1 });
-    const Shorts = await product
-      .find({
-        category: { $regex: "Shorts", $options: "i" },
-      })
-      .sort({ sold: 1 });
-    const Skirt = await product
-      .find({
-        category: { $regex: "Skirt", $options: "i" },
-      })
-      .sort({ sold: 1 });
-    const Dress = await product
-      .find({
-        category: { $regex: "Dress", $options: "i" },
-      })
-      .sort({ sold: 1 });
-    const Hidjeb = await product
-      .find({
-        category: { $regex: "Hidjeb", $options: "i" },
-      })
-      .sort({ sold: 1 });
+    const Shoe = await Product.find({
+      category: { $regex: "shoe", $options: "i" },
+    }).sort({ sold: 1 });
+    const Pants = await Product.find({
+      category: { $regex: "pants", $options: "i" },
+    }).sort({ sold: 1 });
+    const Hoodie = await Product.find({
+      category: { $regex: "hoodie", $options: "i" },
+    }).sort({ sold: 1 });
+    const TShirt = await Product.find({
+      category: { $regex: "TShirt", $options: "i" },
+    }).sort({ sold: 1 });
+    const Jacket = await Product.find({
+      category: { $regex: "Jacket", $options: "i" },
+    }).sort({ sold: 1 });
+    const Sweater = await Product.find({
+      category: { $regex: "Sweater", $options: "i" },
+    }).sort({ sold: 1 });
+    const Shorts = await Product.find({
+      category: { $regex: "Shorts", $options: "i" },
+    }).sort({ sold: 1 });
+    const Skirt = await Product.find({
+      category: { $regex: "Skirt", $options: "i" },
+    }).sort({ sold: 1 });
+    const Dress = await Product.find({
+      category: { $regex: "Dress", $options: "i" },
+    }).sort({ sold: 1 });
+    const Hidjeb = await Product.find({
+      category: { $regex: "Hidjeb", $options: "i" },
+    }).sort({ sold: 1 });
     res.status(200).json({
       mostSold: mostSold,
       promoted: promoted,
