@@ -70,7 +70,7 @@ const userSchema = new mongoose.Schema({
         required: true,
       },
 
-      _id: {
+      id: {
         type: mongoose.Types.ObjectId,
         required: true,
       },
@@ -87,24 +87,23 @@ const userSchema = new mongoose.Schema({
   },
 
   resetPassword: {
-    string : {type: String,
-    default : "b69be89d982eed865b7bb9cdc5d18b671fc6e7601cd"+ Date.now()},
-    attempts : {
-      type : Number,
-      default:3
+    string: {
+      type: String,
+      default: "b69be89d982eed865b7bb9cdc5d18b671fc6e7601cd" + Date.now(),
     },
-    cooldown : {
+    attempts: {
+      type: Number,
+      default: 3,
+    },
+    cooldown: {
       type: Date,
-      default: Date.now()
+      default: Date.now(),
     },
     expiresIn: {
       type: Date,
-      default: Date.now()
-    }
-    
-
-  }
-  
+      default: Date.now(),
+    },
+  },
 });
 
 module.exports = mongoose.model("User", userSchema);

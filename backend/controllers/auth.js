@@ -44,11 +44,9 @@ exports.userLogin = async (req, res) => {
     }
 
     // Generate the token
-    const token = jwt.sign(
-      { id: user._id},
-      process.env.JWT_TOKEN,
-      { expiresIn: "2d" }
-    );
+    const token = jwt.sign({ id: user._id }, process.env.JWT_TOKEN, {
+      expiresIn: "2d",
+    });
 
     res.status(200).json({
       jwt: token,
@@ -58,7 +56,7 @@ exports.userLogin = async (req, res) => {
         firstName: user.firstName,
         lastName: user.lastName,
         email: user.email,
-        // isSeller: user.isSeller,
+        isSeller: user.isSeller,
       },
     });
   } catch (error) {

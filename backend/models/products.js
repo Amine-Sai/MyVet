@@ -19,7 +19,18 @@ const itemSchema = new mongoose.Schema({
 
   category: {
     type: String,
-    enum:["Shoe", "Pants", "Hoodie", "TShirt", "Jacket", "Sweater", "Shorts", "Skirt", "Dress", "Hidjeb"], //add types if needed
+    enum: [
+      "Shoe",
+      "Pants",
+      "Hoodie",
+      "TShirt",
+      "Jacket",
+      "Sweater",
+      "Shorts",
+      "Skirt",
+      "Dress",
+      "Hidjeb",
+    ], //add types if needed
     required: true,
   },
 
@@ -67,7 +78,7 @@ const itemSchema = new mongoose.Schema({
       ],
       color: {
         type: String,
-        required: true,
+        default: "",
       },
     },
   ],
@@ -107,8 +118,8 @@ const itemSchema = new mongoose.Schema({
 
   sold: {
     type: Number,
-    default :0,
-  }
+    default: 0,
+  },
 });
 
 const Product = mongoose.model("product", itemSchema);

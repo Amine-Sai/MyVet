@@ -1,48 +1,52 @@
 const User = require("../models/user");
 const Product = require("../models/products");
-const mongoose = require("mongoose");
 
 exports.toggleFavorite = async (req, res) => {
   try {
-    const id = req.userId;
+    const userId = req.userId;
+    if (!userId) return res.status(400).json({ message: "Bad request" });
     const { productId } = req.params;
 
-    if (!id) return res.status(400).json({ message: "Bad request" });
+    const user = await User.findById(userId);
 
-    const user = await User.findById(id);
     if (!user) return res.status(404).json({ message: "User not found" });
 
     const product = await Product.findById(productId);
     if (!product)
       return res.status(404).json({ message: "product not found." });
 
-    const prodId = new mongoose.Types.ObjectId(productId);
-    const isFavorite = user.favorites.some((favorite) =>
-      favorite._id.equals(prodId)
+    const isFavorite = user.favorites.some(
+      (favorite) => favorite.id == productId
     );
-
+    console.log(isFavorite);
     if (!isFavorite) {
       user.favorites.push({
-        _id: productId,
-        pic: product.pic,
+        id: productId,
+        pic: product.pic[0],
         name: product.name,
-        price: product.price(1 - product.promotion),
+        price: product.price * (1 - product.promotion),
       });
-
-      await user.save();
+      console.log(productId, product.name);
       res.status(201).json({
-        message: `${name} is now in your favorites`,
+        message: `${product.name} is now in your favorites`,
       });
     } else {
-      await User.findByIdAndUpdate(id, {
-        $pull: {
-          favorites: {
-            _id: productId,
+      await User.findOneAndUpdate(
+        { _id: userId },
+        {
+          $pull: {
+            favorites: {
+              id: productId,
+            },
           },
-        },
-      });
-      res.status(200).json({ message: `${name} removed from favorites` });
+        }
+      );
+      res
+        .status(200)
+        .json({ message: `${product.name} removed from favorites` });
     }
+    console.log();
+    await user.save();
   } catch (err) {
     console.log(err);
     res.status(400).json({ message: "Error occurred" });

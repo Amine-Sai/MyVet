@@ -1,6 +1,7 @@
 const Product = require("../models/products");
 const product = require("../models/products");
 const User = require("../models/user");
+const mongoose = require("mongoose");
 
 exports.createProduct = async (req, res) => {
   try {
@@ -46,16 +47,17 @@ exports.getProduct = async (req, res) => {
     if (!product)
       return res.status(404).json({ message: "Product unavailable" });
 
-    let heart = false;
-    let user = null;
-    if (req.userId)
-      user = await User.findOne({
-        _id: product.sellerid,
-        favorites: { $elemMatch: { _id: mongoose.Types.ObjectId(productId) } },
-      });
-    if (user) heart = true;
+    var heart = false;
+    if (req.userId) {
+      let user = await User.findById(req.userId);
+      console.log(user.favorites);
+
+      heart = user.favorites.some((favorite) => favorite.id == productId);
+      console.log(heart);
+    }
     res.status(200).json({ result: product, isFavorite: heart });
   } catch (error) {
+    console.log(error);
     res.status(500).json({ message: "Error occurred" });
   }
 };
