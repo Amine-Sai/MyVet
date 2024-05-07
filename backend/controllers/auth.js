@@ -21,6 +21,7 @@ exports.createUser = async (req, res) => {
       phoneNumber: phoneNumber,
       products: [],
       favorites: [],
+      Cart: [],
       salt: salt,
     });
 
