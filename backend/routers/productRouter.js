@@ -13,7 +13,7 @@ const cookieAuth = require("../middleware/cookieAuth");
 router.post("/:sellerId", cookieAuth, createProduct);
 
 // search & filter
-router.get("/search/", searchFilter);
+router.get("/search", searchFilter);
 
 // load product page
 router.get("/product/:productId", cookieAuth, getProduct);
