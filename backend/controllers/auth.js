@@ -73,8 +73,8 @@ const emailVerification = async (email, code) => {
   const transporterr = nodemailer.createTransport({
     service: "Gmail",
     auth: {
-      user: `${process.env.ADMIN_EMAIL}`, //admin email
-      pass: `${process.env.PASSWORD}`, // admin pass
+      user:"aa.denai@esi-sba.dz", //admin email
+      pass: "xngp nddv ujmb ogmw", // admin pass
     },
   });
 
