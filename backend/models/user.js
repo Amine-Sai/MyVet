@@ -56,23 +56,18 @@ const userSchema = new mongoose.Schema({
   ],
   favorites: [
     {
-      pic: {
-        type: String,
-        required: true,
-      },
-      name: {
-        type: String,
-        required: true,
-      },
-
-      price: {
-        type: Number,
-        required: true,
-      },
-
       id: {
         type: mongoose.Types.ObjectId,
-        required: true,
+      },
+      pic: {
+        type: String,
+      },
+      price: {
+        type: Number,
+      },
+
+      name: {
+        type: String,
       },
     },
   ],

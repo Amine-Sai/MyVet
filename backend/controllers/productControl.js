@@ -143,7 +143,10 @@ exports.updateProduct = async (req, res) => {
 
 exports.delProduct = async (req, res) => {
   try {
+    if (req.userID || req.params.productId)
+      return res.status(404).json({ message: "page not found" });
     const { userId } = req;
+
     const deleted = await Product.findOneAndDelete({
       _id: req.params.productId,
       sellerId: userId,
@@ -151,11 +154,10 @@ exports.delProduct = async (req, res) => {
 
     if (deleted)
       await User.updateOne(
-        { _id: deleted.sellerid },
+        { _id: userId },
         {
           $pullAll: {
-            favorites: [{ id: productId }],
-            products: [{ _id: productId }],
+            products: [{ _id: req.params.productId }],
           },
         }
       );

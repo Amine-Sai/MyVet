@@ -34,7 +34,7 @@ async function run() {
       console.log(`Server is running on port ${PORT}`);
     });
   } catch (error) {
-    console.log("Cannot connect.");
+    console.log("Cannot connect");
   }
 }
 run();
