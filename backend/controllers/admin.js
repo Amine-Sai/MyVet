@@ -4,13 +4,14 @@ const bcrypt = require("bcryptjs");
 const Product = require("../models/products");
 const admin = require("../models/admin");
 const Math = require("mathjs");
+require("dotenv").config();
 
 const emailVerification = async (email, code) => {
   const transporterr = nodemailer.createTransport({
     service: "Gmail",
     auth: {
       user: `${process.env.ADMIN_EMAIL}`,
-      pass: `${process.env.password}`, // Your password
+      pass: `${process.env.password}`,
     },
   });
 
