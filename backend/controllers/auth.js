@@ -22,6 +22,7 @@ exports.createUser = async (req, res) => {
       phoneNumber: phoneNumber,
       products: [],
       favorites: [],
+      Cart: [],
       salt: salt,
     });
 
@@ -74,13 +75,13 @@ const emailVerification = async (email, code) => {
   const transporterr = nodemailer.createTransport({
     service: "Gmail",
     auth: {
-      user: `${process.env.ADMIN_EMAIL}`, //admin email
-      pass: `${process.env.PASSWORD}`, // admin pass
+      user:"aa.denai@esi-sba.dz", //admin email
+      pass: "xngp nddv ujmb ogmw", // admin pass
     },
   });
 
   const mailOptions = {
-    from: `${process.env.ADMIN_EMAIL}`,
+    from: "aa.denai@esi-sba.dz",
     to: email,
     subject: "Reset password",
     text: `Your verification code is: ${code}`,
