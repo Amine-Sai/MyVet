@@ -1,38 +1,35 @@
 const User = require("../models/user");
 const mongoose = require("mongoose");
-const Product = require('../models/products'); 
+const Product = require("../models/products");
 
 exports.getCart = async (req, res) => {
-  const userId = req.userId;
-  const user = await User.findById(userId);
-  
-  if (!user) return res.status(404).json({ message: "User not found." });
-  res.status(200).json({ Cart: user.Cart });
+  if (!req.userId)
+    return res.status(404).json({ message: "you must be logged in." });
+  const user = await User.findById(req.userId);
+  console.log(user);
+  if (!user || user.Cart.length < 1)
+    return res.status(404).json({ message: "Page not available" });
+
+  let Carts = await Promise.all(
+    user.Cart.map(async (cart) => {
+      let productCart = await Product.findById(cart.productId);// if there was a mistake i know the solution 
+      return productCart
+        ? {
+          productId: productCart._id,
+            pic: productCart.pic[0],
+            price:productCart.price * (1 - productCart.promotion),
+            name: productCart.name,
+          }
+        : null;
+    })
+  );
+  const filteredCart =Carts.filter(Boolean);
+  user.Cart = filteredCart;
+  await user.save();
+
+  return res.status(200).json({ favorites: filteredFavs });
 };
-/*exports.BuyFromCart = async (req, res) => {
-  // cheking if the user exsite////////////////////////////////////////
-  const id = req.userId;
-  const { productId } = req.params;
-  if (!id) return res.status(400).json({ message: "Bad request" });
 
-  const user = await User.findById(id);
-  if (!user) return res.status(404).json({ message: "User not found" });
-  /////////////////////////////////////////////////////////////////////////
-  // if the cart is empty then there is no buy button
-  let totalPrice = 0;
-  for (const { prices, quantity } of user.Cart) {
-    const prices = user.Cart;
-    if (quantity > stock)
-      return res
-        .status(400)
-        .json({
-          message: `Not enough stock for product ${user.Cart.colors.name}`,
-        });
-
-    const productPrice = (price - price * product.promotion) * quantity;
-    totalPrice += productPrice;
-  }
-};*/
 exports.addtoCart = async (req, res) => {
  try { const { productId, name, color, size, quantity, pic, price } = req.body;
   const user = await User.findById(userId);
@@ -74,114 +71,59 @@ exports.addtoCart = async (req, res) => {
     res.status(500).json({ message: 'Internal server error' });
   }
 };
-exports.removeProduct = async (req , res) => { 
-
- try { const { productId,  color, size } = req.body;
-  
-  
-  const user = await User.findById(userId);
-  if (!user) return res.status(404).json({ message: "User not found." });
-  
-  
-  
-  
-  
-  
-  const productIndex = this.Cart.findIndex(item =>
-  item.productId.toString() === productId.toString() &&
-  item.colors.some(colorItem => colorItem.color === color &&
-    colorItem.sizes.some(sizeItem => sizeItem.value === size))
-);
-
-if (productIndex !== -1) {
-  const product = this.Cart[productIndex];
-  const colorIndex = product.colors.findIndex(item => item.color === color);
-  const sizeIndex = product.colors[colorIndex].sizes.findIndex(item => item.value === size);
-
-  // If quantity is greater than 0, decrement quantity
-  if (product.colors[colorIndex].sizes[sizeIndex].quantity > 0) {
-    product.colors[colorIndex].sizes[sizeIndex].quantity--;
-    product.price -= product.colors[colorIndex].sizes[sizeIndex].price;
-  }
-
-  // If quantity becomes 0, remove the product from the cart
-  if (product.colors[colorIndex].sizes[sizeIndex].quantity === 0) {
-    product.colors[colorIndex].sizes.splice(sizeIndex, 1);
-    if (product.colors[colorIndex].sizes.length === 0) {
-      product.colors.splice(colorIndex, 1);
-    }
-  }
-
-  // If all colors/sizes of the product are removed, remove the product from the cart
-  if (product.colors.length === 0) {
-    this.Cart.splice(productIndex, 1);
-  }
-
-  // Save the user document
-  await this.save();
-}
-
-
-
- } catch (error) {
-  console.error(error);
-  res.status(500).json({ message: 'Internal server error' });
-}
-  }
- exports.refreshprice = async (req , res ) => {
-    try {
-      const user = await User.findById(req.user.id); 
-  
-      if (!user) {
-        return res.status(404).json({ message: 'User not found' });
-      }
-  
-     
-      for (let product of user.Cart) {
-        let totalPrice = 0;
-  
-       
-        for (let colorItem of product.colors) {
-          
-          for (let sizeItem of colorItem.sizes) {
-            
-            const productVariant = await Product.findOne({
-              productId: product.productId,
-              color: colorItem.color,
-              size: sizeItem.value
-            });
-  
-            if (productVariant) {
-              
-              sizeItem.price = productVariant.price;
-             
-              totalPrice = productVariant.price ;
-            } else {
-              console.error(`Product variant not found: ${product.productId}, ${colorItem.color}, ${sizeItem.value}`);
-            }
-          }
-        }
-  
-        product.price = totalPrice;
-      }
-  
-      
-      await user.save();
-  
-      
-      res.status(200).json({ message: 'Cart prices refreshed successfully' });
-    } catch (error) {
-      console.error('Error refreshing cart prices:', error);
-      res.status(500).json({ message: 'Internal server error' });
-    }
+/*exports.removeProduct = async (req, res) => {
+  try {
+    const { productId, color, size } = req.body;
+    const userId = req.userId; 
     
+    const user = await User.findById(userId);
+    if (!user) return res.status(404).json({ message: "User not found." });
 
+    const productIndex = user.Cart.findIndex(item =>
+      item.productId.toString() === productId.toString() &&
+      item.colors.some(colorItem => colorItem.color === color &&
+        colorItem.sizes.some(sizeItem => sizeItem.value === size))
+    );
 
+    if (productIndex !== -1) {
+      const product = user.Cart[productIndex];
+      const colorIndex = product.colors.findIndex(item => item.color === color);
+      const sizeIndex = product.colors[colorIndex].sizes.findIndex(item => item.value === size);
 
+      // If quantity is greater than 0, decrement quantity
+      if (product.colors[colorIndex].sizes[sizeIndex].quantity > 0) {
+        product.colors[colorIndex].sizes[sizeIndex].quantity--;
+        product.price -= product.colors[colorIndex].sizes[sizeIndex].price;
+      }
+
+      // If quantity becomes 0, remove the product from the cart
+      if (product.colors[colorIndex].sizes[sizeIndex].quantity === 0) {
+        product.colors[colorIndex].sizes.splice(sizeIndex, 1);
+        if (product.colors[colorIndex].sizes.length === 0) {
+          product.colors.splice(colorIndex, 1);
+        }
+      }
+
+      // If all colors/sizes of the product are removed, remove the product from the cart
+      if (product.colors.length === 0) {
+        user.Cart.splice(productIndex, 1);
+      }
+
+      // Save the user document
+      await user.save();
+      res.status(200).json({ message: 'Product removed from cart successfully' });
+    } else {
+      res.status(404).json({ message: 'Product not found in cart' });
+    }
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ message: 'Internal server error' });
   }
+};*/
 
 
-  exports.BuyproductofCart = async (req , res ) => {
+
+ /* exports.BuyproductofCart = async (req , res ) => {
     
   try { const user = await User.findById(req.user.id); 
   
@@ -233,4 +175,4 @@ if (productIndex !== -1) {
     res.status(500).json({ message: 'Internal server error' });
   }
 
-  }
+  }*/
