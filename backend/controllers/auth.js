@@ -3,6 +3,7 @@ const User = require("../models/user");
 const jwt = require("jsonwebtoken");
 const Math = require("mathjs");
 const nodemailer = require("nodemailer");
+require("dotenv").config();
 
 exports.createUser = async (req, res) => {
   try {

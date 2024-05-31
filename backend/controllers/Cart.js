@@ -178,8 +178,7 @@ if (productIndex !== -1) {
 
 
 
-  }// resfresh price will be automatically updated when we have get cart but the question is when can i get the reduced price if there promotion 
-  // another question will i put the refresh price in the getcart method or in the  router of the id cart 
+  }
 
 
   exports.BuyproductofCart = async (req , res ) => {
@@ -223,7 +222,7 @@ if (productIndex !== -1) {
 
 
 
-// whats up niggas
+
 
 
 

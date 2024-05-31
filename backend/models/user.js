@@ -78,7 +78,7 @@ const userSchema = new mongoose.Schema({
    
      colors: 
        {
-         sizes: [
+         sizes: 
            {
              value: {
                type: String,
@@ -89,13 +89,7 @@ const userSchema = new mongoose.Schema({
                default: 0,
                max: 45,
              },
-   
-            quantity : {
-               type: Number,
-              default: 1,
-             },
            },
-         ],
          color: {
            type: String,
            required: true,
@@ -106,21 +100,31 @@ const userSchema = new mongoose.Schema({
        type: Number,
        required: true,
      }, 
+
      name: {
        type: String,
        required: true,
      },
-   
-     pic: [
+     
+     quantity: {
+      type: Number,
+      default: 1,
+     },
+
+     pic:
        {
          type: String,
          required: true,
        },
-     ],
-    productId: { type: mongoose.Types.ObjectId, ref: "Product", required: true },
- 
+
+    productId: {
+       type: mongoose.Types.ObjectId,
+       required: true 
+      },
+
    },
  ],
+
   salt: {
     type: String,
     required: true,
