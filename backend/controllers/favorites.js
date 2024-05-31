@@ -12,12 +12,8 @@ exports.toggleFavorite = async (req, res) => {
     if (!user) return res.status(404).json({ message: "User not found" });
 
     const product = await Product.findById(productId);
-    if (!product) {
-      //   for (let prod in user.favorites){
-      //     if (prod.id == productId)
-      //   }
-      return res.status(404).json({ message: "product not found." });
-    }
+    if (!product) return res.status(404).json({ message: "product not found." });
+    
     const isFavorite = user.favorites.some(
       (favorite) => favorite.id == productId
     );
@@ -43,7 +39,6 @@ exports.toggleFavorite = async (req, res) => {
         .status(200)
         .json({ message: `${product.name} removed from favorites` });
     }
-    console.log();
     await user.save();
   } catch (err) {
     console.log(err);
