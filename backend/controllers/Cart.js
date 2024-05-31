@@ -27,7 +27,7 @@ exports.getCart = async (req, res) => {
   user.Cart = filteredCart;
   await user.save();
 
-  return res.status(200).json({ favorites: filteredFavs });
+  return res.status(200).json({ Cart: filteredCart});
 };
 
 exports.addtoCart = async (req, res) => {
