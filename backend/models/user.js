@@ -72,7 +72,6 @@ const userSchema = new mongoose.Schema({
     },
   ],
 
-
   Cart: [
     {   
      colors: 
@@ -100,6 +99,7 @@ const userSchema = new mongoose.Schema({
 
      name: {
        type: String,
+       required: true,
      },
      
      quantity: {
