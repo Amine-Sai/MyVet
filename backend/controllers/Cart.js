@@ -35,8 +35,10 @@ exports.getCart = async (req, res) => {
 
 exports.addtoCart = async (req, res) => {
  try { const { productId, name, color, size, quantity, pic, price } = req.body;
-  const user = await User.findById(req.userId);
-  if (!user) return res.status(404).json({ message: "User not found." });
+ if (!req.userId)
+  return res.status(404).json({ message: "you must be logged in." });
+const user = await User.findById(req.userId);
+console.log(user);
 
   const existingProductIndex = user.Cart.findIndex(item =>
     item.productId.toString() === productId.toString() &&
