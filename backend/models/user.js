@@ -75,27 +75,25 @@ const userSchema = new mongoose.Schema({
 
   Cart: [
     {   
-   
      colors: 
-       [{
+       {
          sizes: 
-           [{
+           {
              value: {
                type: String,
-               enum: ["S", "M", "L", "XL", "XXL"],
+               enum: ["S", "M", "L", "XL", "XXL",""],
              },
              ShoeSize: {
                type: Number,
                default: 0,
                max: 45,
              },
-           }],
+           },
          color: {
            type: String,
-           required: true,
          },
-       }],
-     
+       },
+  
      price: {
        type: Number,
      }, 

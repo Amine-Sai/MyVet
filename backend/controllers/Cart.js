@@ -1,35 +1,36 @@
 const User = require("../models/user");
-const mongoose = require("mongoose");
 const Product = require("../models/products");
 
 exports.getCart = async (req, res) => {
   if (!req.userId)
     return res.status(404).json({ message: "you must be logged in." });
   const user = await User.findById(req.userId);
-  console.log(user);
   if (!user || user.Cart.length < 1)
-    return res.status(404).json({ message: "Cart is empty " });
+    return res.status(404).json({
+      message: "Cart is empty ",
+      cart: [],
+    });
 
   let Carts = await Promise.all(
     user.Cart.map(async (cartItem) => {
-      let productCart = await Product.findById(cartItem.productId);// if there was a mistake i know the solution 
+      let productCart = await Product.findById(cartItem.productId);
       return productCart
         ? {
-          productId: productCart._id,
-            pic: productCart.pic[0],
-            price:productCart.price * (1 - productCart.promotion),
-            name: productCart.name,
             colors: cartItem.colors,
-           
+            name: productCart.name,
+            price: productCart.price * (1 - productCart.promotion),
+            quantity: productCart.quantity,
+            pic: productCart.pic[0],
+            productId: productCart._id,
           }
         : null;
     })
   );
-  const filteredCart =Carts.filter(Boolean);
+  const filteredCart = Carts.filter(Boolean);
   user.Cart = filteredCart;
   await user.save();
 
-  return res.status(200).json({ Cart: filteredCart});
+  return res.status(200).json({ Cart: filteredCart });
 };
 
 /*exports.addtoCart = async (req, res) => {
@@ -168,7 +169,6 @@ console.log(user);
   }
 };*/
 
-
 exports.addtoCart = async (req, res) => {
   try {
     const userId = req.userId;
@@ -181,16 +181,19 @@ exports.addtoCart = async (req, res) => {
     if (!user) return res.status(404).json({ message: "User not found" });
 
     const product = await Product.findById(productId);
-    if (!product) return res.status(404).json({ message: "product not found." });
-    
+    if (!product)
+      return res.status(404).json({ message: "product not found." });
+
     const isinCart = user.Cart.some(
-      (cartItem) => cartItem.id == productId && cartItem.colors.color  == colors.color  && cartItem.colors.sizes == colors.sizes
+      (cartItem) =>
+        cartItem.id == productId &&
+        cartItem.colors.color == colors.color &&
+        cartItem.colors.sizes == colors.sizes
     );
     if (!isinCart) {
       user.Cart.push({
         productId: productId,
-        colors : colors ,
-       
+        colors: colors,
       });
       res.status(201).json({
         message: `${product.name} is now in your Cart`,
@@ -202,14 +205,12 @@ exports.addtoCart = async (req, res) => {
           $pull: {
             Cart: {
               productId: productId,
-              colors : colors ,
+              colors: colors,
             },
           },
         }
       );
-      res
-        .status(200)
-        .json({ message: `${product.name} removed from Cart` });
+      res.status(200).json({ message: `${product.name} removed from Cart` });
     }
     await user.save();
   } catch (err) {
@@ -218,25 +219,7 @@ exports.addtoCart = async (req, res) => {
   }
 };
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
- /* exports.BuyproductofCart = async (req , res ) => {
+/* exports.BuyproductofCart = async (req , res ) => {
 
 
     
