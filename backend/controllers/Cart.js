@@ -171,7 +171,7 @@ exports.addtoCart = async (req, res) => {
   try {
     const userId = req.userId;
     if (!userId) return res.status(400).json({ message: "Bad request" });
-    const { productIds } = req.params;
+    const { productId } = req.params;
     const { colorfy , sizing, quantitynum } = req.body;
 
     const user = await User.findById(userId);
@@ -179,14 +179,15 @@ exports.addtoCart = async (req, res) => {
     if (!user) return res.status(404).json({ message: "User not found" });
 
     const product = await Product.findById(productId);
+    console.log(product )
     if (!product) return res.status(404).json({ message: "product not found." });
     
     const isinCart = user.Cart.some(
-      (cartItem) => cartItem.id == productIds && cartItem.colors.color  == colorfy && cartItem.colors.sizes == sizing 
+      (cartItem) => cartItem.id == productId && cartItem.colors.color  == colorfy && cartItem.colors.sizes == sizing 
     );
     if (!isinCart) {
       user.Cart.push({
-        productId: productIds,
+        productId: productId,
         quantity: quantitynum,
         color : colorfy,
         sizes : sizing,
@@ -200,7 +201,7 @@ exports.addtoCart = async (req, res) => {
         {
           $pull: {
             Cart: {
-              productId: productIds,
+              productId: productId,
               quantity: quantitynum,
               color : colorfy,
               sizes : sizing, 
