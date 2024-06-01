@@ -31,7 +31,7 @@ exports.getCart = async (req, res) => {
   await user.save();
 
   return res.status(200).json({ Cart: filteredCart});
-};
+};//done 
 
 /*exports.addtoCart = async (req, res) => {
  try { const { productId, name, color, size, quantity, pic, price } = req.body;
