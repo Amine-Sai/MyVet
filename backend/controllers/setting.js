@@ -81,6 +81,11 @@ exports.updatePassword = async (req, res) => {
   try {
     const user = await User.findById(userId);
     if (!user) return res.status(404).json({ message: "User not found." });
+const { password} = req.password;
+const salt = await bcrypt.genSalt(10);
+hashedPassword = await bcrypt.hash(password, salt);
+req.user.password = hashedPassword ;
+req.user.salt = salt;
 
     res.status(200).json({ message: "password updated successfully" });
   } catch (error) {

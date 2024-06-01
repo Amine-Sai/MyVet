@@ -8,3 +8,5 @@ const {
   updatePic,
   updatePassword,
 } = require("../controllers/setting");
+
+router.post("/product/:productId", cookieAuth, addtoCart);

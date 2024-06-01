@@ -8,7 +8,7 @@ const {
 } = require("../controllers/Cart");
 const cookieAuth = require("../middleware/cookieAuth");
 
-router.post("/product/:productId", cookieAuth, addtoCart);
+router.post("/cart/product/:productId", cookieAuth, addtoCart);
 router.get("/Cart", cookieAuth, getCart);
 //router.delete("/Cart/:productId", cookieAuth, removeProduct);
 //router.post("/Cart/buy", cookieAuth, BuyproductofCart);
