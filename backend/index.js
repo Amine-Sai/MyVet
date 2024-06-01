@@ -12,7 +12,7 @@ const userRouter = require("./routers/userRouter");
 const favoritesRouter = require("./routers/favoritesrouter");
 const reportRouter = require("./routers/reportRouter");
 const Cartrouter = require("./routers/Cartrouter");
-
+const Settingsrouter = require("./routers/Settingsrouter");
 const app = express();
 const PORT = process.env.PORT || 3000;
 
@@ -27,6 +27,8 @@ app.use("", userRouter);
 app.use("", favoritesRouter);
 app.use("", reportRouter);
 app.use("", Cartrouter);
+app.use("", Settingsrouter);
+
 async function run() {
   try {
     mongoose.connect(process.env.MONGO_CONNECTION);

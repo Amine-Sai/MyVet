@@ -77,7 +77,7 @@ const userSchema = new mongoose.Schema({
     {   
    
      colors: 
-       {
+       [{
          sizes: 
            {
              value: {
@@ -94,7 +94,7 @@ const userSchema = new mongoose.Schema({
            type: String,
            required: true,
          },
-       },
+       }],
      
      price: {
        type: Number,

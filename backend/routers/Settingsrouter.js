@@ -6,7 +6,12 @@ const {
   updateFirstname,
   updateLastname,
   updatePic,
-  updatePassword,
+   updatePassword,
 } = require("../controllers/setting");
 
-router.post("/product/:productId", cookieAuth, addtoCart);
+router.post("/Settings/update-email", cookieAuth,updateEmail);
+router.post("/Settings/update-Firstname", cookieAuth,updateFirstname);
+router.post("/Settings/update-Lastname", cookieAuth, updateLastname);
+router.post("/Settings/update-Pic", cookieAuth, updatePic);
+router.post("/Settings/update-Password", cookieAuth, updatePassword);
+module.exports = router;
