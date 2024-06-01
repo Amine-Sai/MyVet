@@ -44,7 +44,11 @@ exports.addtoCart = async (req, res) => {
       return res.status(404).json({ message: "product not found." });
 
     const inCart = user.Cart.some(
-      (cartItem) => cartItem.id == productId && cartItem.colors == colors
+      (cartItem) =>
+        cartItem.id == productId &&
+        cartItem.colors.color == colors.color &&
+        cartItem.colors.sizes.value == colors.sizes.value &&
+        cartItem.colors.sizes.ShoeSize == colors.sizes.ShoeSize
     );
     if (!inCart) {
       user.Cart.push({
