@@ -175,7 +175,7 @@ exports.addtoCart = async (req, res) => {
     const userId = req.userId;
     if (!userId) return res.status(400).json({ message: "Bad request" });
     const { productId } = req.params;
-    const { colorfy , sizing, quantitynum } = req.body;
+    const { colors } = req.body;
 
     const user = await User.findById(userId);
 
@@ -185,14 +185,14 @@ exports.addtoCart = async (req, res) => {
     if (!product) return res.status(404).json({ message: "product not found." });
     
     const isinCart = user.Cart.some(
-      (cartItem) => cartItem.id == productId && cartItem.colors.color  == colorfy && cartItem.colors.sizes == sizing 
+      (cartItem) => cartItem.id == productId && cartItem.colors.color  == colors.color  && cartItem.colors.sizes == colors.sizes
     );
     if (!isinCart) {
       user.Cart.push({
         productId: productId,
-        quantity: quantitynum,
-        color : colorfy,
-        sizes : sizing,
+        quantity: colors.quantity,
+        color : colors.color,
+        sizes : colors.sizes,
       });
       res.status(201).json({
         message: `${product.name} is now in your Cart`,
@@ -204,9 +204,9 @@ exports.addtoCart = async (req, res) => {
           $pull: {
             Cart: {
               productId: productId,
-              quantity: quantitynum,
-              color : colorfy,
-              sizes : sizing, 
+              quantity: colors.quantity,
+              color : colors.color,
+              sizes : colors.sizes,
             },
           },
         }
