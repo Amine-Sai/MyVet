@@ -15,7 +15,16 @@ exports.getCart = async (req, res) => {
     let Carts = await Promise.all(
       user.Cart.map(async (cartItem) => {
         let productCart = await Product.findById(cartItem.productId);
-        return productCart ? cartItem : null;
+        return productCart
+          ? {
+              colors: cartItem.colors,
+              price: productCart.price * (1 - productCart.promotion),
+              name: productCart.name,
+              quantity: cartItem.quantity,
+              pic: productCart.pic[0],
+              productId: productCart._id,
+            }
+          : null;
       })
     );
     Carts = Carts.filter(Boolean);
