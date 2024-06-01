@@ -33,7 +33,7 @@ exports.getCart = async (req, res) => {
   return res.status(200).json({ Cart: filteredCart});
 };
 
-exports.addtoCart = async (req, res) => {
+/*exports.addtoCart = async (req, res) => {
  try { const { productId, name, color, size, quantity, pic, price } = req.body;
  if (!req.userId)
   return res.status(404).json({ message: "you must be logged in." });
@@ -75,7 +75,7 @@ console.log(user);
     console.error(error);
     res.status(500).json({ message: 'Internal server error' });
   }
-};
+};*/
 /*exports.removeProduct = async (req, res) => {
   try {
     const { productId, color, size } = req.body;
@@ -165,6 +165,70 @@ console.log(user);
     return res.status(500).json({ message: "Internal server error" });
   }
 };*/
+
+
+exports.addtoCart = async (req, res) => {
+  try {
+    const userId = req.userId;
+    if (!userId) return res.status(400).json({ message: "Bad request" });
+    const { productIds } = req.params;
+    const { colorfy , sizing, quantitynum } = req.body;
+
+    const user = await User.findById(userId);
+
+    if (!user) return res.status(404).json({ message: "User not found" });
+
+    const product = await Product.findById(productId);
+    if (!product) return res.status(404).json({ message: "product not found." });
+    
+    const isinCart = user.Cart.some(
+      (cartItem) => cartItem.id == productId && cartItem.colors.color  == colorfy && cartItem.colors.sizes == sizing 
+    );
+    if (!isinCart) {
+      user.Cart.push({
+        productId: productIds,
+      });
+      res.status(201).json({
+        message: `${product.name} is now in your favorites`,
+      });
+    } else {
+      await User.findOneAndUpdate(
+        { _id: userId },
+        {
+          $pull: {
+            Cart: {
+              productId: productId,
+            },
+          },
+        }
+      );
+      res
+        .status(200)
+        .json({ message: `${product.name} removed from favorites` });
+    }
+    await user.save();
+  } catch (err) {
+    console.log(err);
+    res.status(400).json({ message: "Error occurred" });
+  }
+};
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
  /* exports.BuyproductofCart = async (req , res ) => {

@@ -79,7 +79,7 @@ const userSchema = new mongoose.Schema({
      colors: 
        [{
          sizes: 
-           {
+           [{
              value: {
                type: String,
                enum: ["S", "M", "L", "XL", "XXL"],
@@ -89,7 +89,7 @@ const userSchema = new mongoose.Schema({
                default: 0,
                max: 45,
              },
-           },
+           }],
          color: {
            type: String,
            required: true,
