@@ -8,7 +8,7 @@ exports.getCart = async (req, res) => {
   if (!user || user.Cart.length < 1)
     return res.status(404).json({
       message: "Cart is empty ",
-      cart: [],
+      Cart: [],
     });
 
   let Carts = await Promise.all(
