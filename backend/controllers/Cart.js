@@ -8,17 +8,20 @@ exports.getCart = async (req, res) => {
   const user = await User.findById(req.userId);
   console.log(user);
   if (!user || user.Cart.length < 1)
-    return res.status(404).json({ message: "Page not available" });
+    return res.status(404).json({ message: "Cart is empty " });
 
   let Carts = await Promise.all(
-    user.Cart.map(async (cart) => {
-      let productCart = await Product.findById(cart.productId);// if there was a mistake i know the solution 
+    user.Cart.map(async (cartItem) => {
+      let productCart = await Product.findById(cartItem.productId);// if there was a mistake i know the solution 
       return productCart
         ? {
           productId: productCart._id,
             pic: productCart.pic[0],
             price:productCart.price * (1 - productCart.promotion),
             name: productCart.name,
+            colors: cartItem.colors,
+            quantity: cartItem.colors.reduce((total, color) =>
+              total + color.sizes.reduce((sum, size) => sum + size.quantity, 0), 0)
           }
         : null;
     })
@@ -32,7 +35,7 @@ exports.getCart = async (req, res) => {
 
 exports.addtoCart = async (req, res) => {
  try { const { productId, name, color, size, quantity, pic, price } = req.body;
-  const user = await User.findById(userId);
+  const user = await User.findById(req.userId);
   if (!user) return res.status(404).json({ message: "User not found." });
 
   const existingProductIndex = user.Cart.findIndex(item =>
@@ -120,10 +123,51 @@ exports.addtoCart = async (req, res) => {
     res.status(500).json({ message: 'Internal server error' });
   }
 };*/
+/*exports.getCart = async (req, res) => {
+  if (!req.userId) {
+    return res.status(404).json({ message: "You must be logged in." });
+  }
 
+  try {
+    const user = await User.findById(req.userId);
+    if (!user || user.Cart.length < 1) {
+      return res.status(404).json({ message: "Cart is empty." });
+    }
+
+    let Carts = await Promise.all(
+      user.Cart.map(async (cartItem) => {
+        let productCart = await Product.findById(cartItem.productId);
+        if (productCart) {
+          return {
+            productId: productCart._id,
+            pic: productCart.pic[0],
+            price: productCart.price * (1 - productCart.promotion),
+            name: productCart.name,
+            colors: cartItem.colors,
+            quantity: cartItem.colors.reduce((total, color) =>
+              total + color.sizes.reduce((sum, size) => sum + size.quantity, 0), 0)
+          };
+        } else {
+          return null;
+        }
+      })
+    );
+
+    const filteredCart = Carts.filter(Boolean);
+    user.Cart = filteredCart;
+    await user.save();
+
+    return res.status(200).json({ Cart: filteredCart });
+  } catch (err) {
+    console.error(err);
+    return res.status(500).json({ message: "Internal server error" });
+  }
+};*/
 
 
  /* exports.BuyproductofCart = async (req , res ) => {
+
+
     
   try { const user = await User.findById(req.user.id); 
   
