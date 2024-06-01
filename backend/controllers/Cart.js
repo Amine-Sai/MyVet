@@ -190,9 +190,8 @@ exports.addtoCart = async (req, res) => {
     if (!isinCart) {
       user.Cart.push({
         productId: productId,
-        quantity: colors.quantity,
-        color : colors.color,
-        sizes : colors.sizes,
+        colors : colors ,
+       
       });
       res.status(201).json({
         message: `${product.name} is now in your Cart`,
@@ -204,9 +203,7 @@ exports.addtoCart = async (req, res) => {
           $pull: {
             Cart: {
               productId: productId,
-              quantity: colors.quantity,
-              color : colors.color,
-              sizes : colors.sizes,
+              colors : colors ,
             },
           },
         }
