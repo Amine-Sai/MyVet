@@ -33,7 +33,7 @@ exports.addtoCart = async (req, res) => {
     const { productId } = req.params;
     const { colors, quantity } = req.body;
 
-    if (quantity < 1) quantity = 1;
+    if (quantity < 1 || !quantity) quantity = 1;
 
     const user = await User.findById(userId);
 
