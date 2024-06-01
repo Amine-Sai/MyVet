@@ -85,6 +85,8 @@ const itemSchema = new mongoose.Schema({
     },
   ],
 
+  
+
   comments: [
     {
       user: {
