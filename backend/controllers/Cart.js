@@ -20,8 +20,7 @@ exports.getCart = async (req, res) => {
             price:productCart.price * (1 - productCart.promotion),
             name: productCart.name,
             colors: cartItem.colors,
-            quantity: cartItem.colors.reduce((total, color) =>
-              total + color.sizes.reduce((sum, size) => sum + size.quantity, 0), 0)
+           
           }
         : null;
     })
@@ -31,7 +30,7 @@ exports.getCart = async (req, res) => {
   await user.save();
 
   return res.status(200).json({ Cart: filteredCart});
-};//done 
+};
 
 /*exports.addtoCart = async (req, res) => {
  try { const { productId, name, color, size, quantity, pic, price } = req.body;
