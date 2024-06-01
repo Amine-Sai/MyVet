@@ -217,9 +217,9 @@ exports.homePage = async (req, res) => {
   try {
     // hard coded incoming !!
 
-    const mostSold = await product.find({}).sort({ sold: 1 }).limit(7);
+    const mostSold = await Product.find({}).sort({ sold: 1 }).limit(7);
 
-    const promoted = await product
+    const promoted = await Product
       .find({ promotion: { $gt: 0 } })
       .sort({ sold: 1 })
       .limit(7);

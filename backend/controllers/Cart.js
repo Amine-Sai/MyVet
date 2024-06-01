@@ -40,6 +40,9 @@ exports.getCart = async (req, res) => {
 const user = await User.findById(req.userId);
 console.log(user);
 
+
+  if (!user) return res.status(404).json({ message: "User not found." });
+
   const existingProductIndex = user.Cart.findIndex(item =>
     item.productId.toString() === productId.toString() &&
     item.colors.some(colorItem => colorItem.color === color &&
@@ -179,7 +182,6 @@ exports.addtoCart = async (req, res) => {
     if (!user) return res.status(404).json({ message: "User not found" });
 
     const product = await Product.findById(productId);
-    console.log(product )
     if (!product) return res.status(404).json({ message: "product not found." });
     
     const isinCart = user.Cart.some(

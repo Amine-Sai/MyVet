@@ -23,6 +23,7 @@ exports.toggleFavorite = async (req, res) => {
       });
       res.status(201).json({
         message: `${product.name} is now in your favorites`,
+        isFavorite: !isFavorite,
       });
     } else {
       await User.findOneAndUpdate(
@@ -37,7 +38,10 @@ exports.toggleFavorite = async (req, res) => {
       );
       res
         .status(200)
-        .json({ message: `${product.name} removed from favorites` });
+        .json({ 
+          message: `${product.name} removed from favorites`,
+          isFavorite: !isFavorite,
+      });
     }
     await user.save();
   } catch (err) {
