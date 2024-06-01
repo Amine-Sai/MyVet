@@ -4,7 +4,7 @@ const Product = require("../models/products");
 exports.getCart = async (req, res) => {
   try {
     if (!req.userId)
-      return res.status(404).json({ message: "you must be logged in." });
+      return res.status(401).json({ message: "you must be logged in." });
     const user = await User.findById(req.userId);
     if (!user || user.Cart.length < 1)
       return res.status(404).json({
@@ -18,11 +18,9 @@ exports.getCart = async (req, res) => {
         return productCart ? cartItem : null;
       })
     );
-    const filteredCart = Carts.filter(Boolean);
-    user.Cart = filteredCart;
-    await user.save();
+    Carts = Carts.filter(Boolean);
 
-    return res.status(200).json({ Cart: filteredCart });
+    return res.status(200).json({ Cart: Carts });
   } catch (error) {
     res.status(500).json({ message: "Error occured." });
   }
@@ -34,7 +32,9 @@ exports.addtoCart = async (req, res) => {
     if (!userId) return res.status(400).json({ message: "Bad request" });
     const { productId } = req.params;
     const { colors, quantity } = req.body;
-    
+
+    if (quantity < 1) quantity = 1;
+
     const user = await User.findById(userId);
 
     if (!user) return res.status(404).json({ message: "User not found" });
