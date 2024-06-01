@@ -182,14 +182,17 @@ exports.addtoCart = async (req, res) => {
     if (!product) return res.status(404).json({ message: "product not found." });
     
     const isinCart = user.Cart.some(
-      (cartItem) => cartItem.id == productId && cartItem.colors.color  == colorfy && cartItem.colors.sizes == sizing 
+      (cartItem) => cartItem.id == productIds && cartItem.colors.color  == colorfy && cartItem.colors.sizes == sizing 
     );
     if (!isinCart) {
       user.Cart.push({
         productId: productIds,
+        quantity: quantitynum,
+        color : colorfy,
+        sizes : sizing,
       });
       res.status(201).json({
-        message: `${product.name} is now in your favorites`,
+        message: `${product.name} is now in your Cart`,
       });
     } else {
       await User.findOneAndUpdate(
@@ -197,14 +200,17 @@ exports.addtoCart = async (req, res) => {
         {
           $pull: {
             Cart: {
-              productId: productId,
+              productId: productIds,
+              quantity: quantitynum,
+              color : colorfy,
+              sizes : sizing, 
             },
           },
         }
       );
       res
         .status(200)
-        .json({ message: `${product.name} removed from favorites` });
+        .json({ message: `${product.name} removed from Cart` });
     }
     await user.save();
   } catch (err) {
