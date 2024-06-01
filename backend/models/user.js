@@ -59,66 +59,52 @@ const userSchema = new mongoose.Schema({
       id: {
         type: mongoose.Types.ObjectId,
       },
-      pic: {
-        type: String,
+    },
+  ],
+
+  Cart: [
+    {
+      colors: {
+        sizes: {
+          value: {
+            type: String,
+            enum: ["S", "M", "L", "XL", "XXL", ""],
+          },
+          ShoeSize: {
+            type: Number,
+            default: 0,
+            max: 45,
+          },
+        },
+        color: {
+          type: String,
+        },
       },
+
       price: {
         type: Number,
       },
 
       name: {
         type: String,
+        required: true,
+      },
+
+      quantity: {
+        type: Number,
+        default: 1,
+      },
+
+      pic: {
+        type: String,
+      },
+
+      productId: {
+        type: mongoose.Types.ObjectId,
+        required: true,
       },
     },
   ],
-
-  Cart: [
-    {   
-     colors: 
-       {
-         sizes: 
-           {
-             value: {
-               type: String,
-               enum: ["S", "M", "L", "XL", "XXL",""],
-             },
-             ShoeSize: {
-               type: Number,
-               default: 0,
-               max: 45,
-             },
-           },
-         color: {
-           type: String,
-         },
-       },
-  
-     price: {
-       type: Number,
-     }, 
-
-     name: {
-       type: String,
-       required: true,
-     },
-     
-     quantity: {
-      type: Number,
-      default: 1,
-     },
-
-     pic:
-       {
-         type: String,
-       },
-
-    productId: {
-       type: mongoose.Types.ObjectId,
-       required: true 
-      },
-
-   },
- ],
 
   salt: {
     type: String,
