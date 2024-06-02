@@ -271,3 +271,35 @@ console.log(user);
   }
 };*/
 // pull request test
+
+exports.removeFromCart = async (req, res) => {
+  try {
+    const userId = req.userId;
+    if (!userId) return res.status(400).json({ message: "Bad request" });
+
+    const { productId } = req.params;
+    const { colors } = req.body;
+
+    const user = await User.findById(userId);
+    if (!user) return res.status(404).json({ message: "User not found" });
+
+    const productIndex = user.Cart.findIndex(
+      (cartItem) =>
+        cartItem.productId == productId &&
+        cartItem.colors.color == colors.color &&
+        cartItem.colors.sizes.value == colors.sizes.value &&
+        cartItem.colors.sizes.ShoeSize == colors.sizes.ShoeSize
+    );
+
+    if (productIndex !== -1) {
+      user.Cart.splice(productIndex, 1); // Remove the product from the cart
+      await user.save();
+      return res.status(200).json({ message: "Product removed from cart" });
+    } else {
+      return res.status(404).json({ message: "Product not found in cart" });
+    }
+  } catch (err) {
+    console.log(err);
+    return res.status(400).json({ message: "Error occurred" });
+  }
+};
