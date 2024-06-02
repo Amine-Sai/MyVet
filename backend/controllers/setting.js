@@ -16,7 +16,7 @@ privacy and policy
 
 
 */
-exports.updateEmail = async (req, res) => {
+/*exports.updateEmail = async (req, res) => {
   try {
     const user = await User.findById(userId);
     if (!user) return res.status(404).json({ message: "User not found." });
@@ -92,8 +92,7 @@ req.user.salt = salt;
     console.error(error);
     res.status(500).json({ message: "Internal server error" });
   }
-};// make it until i understand the relation between salt and password 
-// in the update password the front will do the confirm password
+};
 exports.updatePic = async (req, res) => {
   try {
 
@@ -111,6 +110,39 @@ exports.updatePic = async (req, res) => {
     await req.user.save();
 
     res.status(200).json({ message: "Profile picture updated successfully" });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ message: "Internal server error" });
+  }
+};*/
+
+
+exports.updateUser = async (req, res) => {
+  try {
+    const user = await User.findById(userId);
+    if (!user) return res.status(404).json({ message: "User not found." });
+  
+
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) {
+      return res.status(400).json({ errors: errors.array() });
+    }
+
+    const { email, firstName, lastName, password, pic } = req.body;
+
+    if (email) user.email = email;
+    if (firstName) user.firstName = firstName;
+    if (lastName) user.lastName = lastName;
+    if (password) {
+      const salt = await bcrypt.genSalt(10);
+      const hashedPassword = await bcrypt.hash(password, salt);
+      user.password = hashedPassword;
+      user.salt = salt;
+    }
+    if (pic) user.pic = pic;
+
+    await user.save();
+    res.status(200).json({ message: "User information updated successfully" });
   } catch (error) {
     console.error(error);
     res.status(500).json({ message: "Internal server error" });
