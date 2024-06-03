@@ -72,7 +72,7 @@ exports.getFavorites = async (req, res) => {
       })
     );
     favs = favs.filter((prod) => prod !== null);
-
+    
     return res.status(200).json({ favorites: favs });
   } catch (error) {
     res.status(400).json({ message: "Error occurred" });

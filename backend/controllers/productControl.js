@@ -1,7 +1,6 @@
 const { prod } = require("mathjs");
 const Product = require("../models/products");
 const User = require("../models/user");
-const mongoose = require("mongoose");
 
 exports.createProduct = async (req, res) => {
   try {
@@ -47,15 +46,17 @@ exports.getProduct = async (req, res) => {
     if (!product)
       return res.status(404).json({ message: "Product unavailable" });
 
-    var heart = false;
+    const owner = await User.findById(product.sellerid);
+    if (!owner) return res.status(500).json({ message: "Error occurred" });
+    const { pic, name } = owner;
+    const seller = { name, pic };
+
+    let heart = false;
     if (req.userId) {
       let user = await User.findById(req.userId);
-      console.log(user.favorites);
-
       heart = user.favorites.some((favorite) => favorite.id == productId);
-      console.log(heart);
     }
-    res.status(200).json({ result: product, isFavorite: heart });
+    res.status(200).json({ result: product, isFavorite: heart, seller });
   } catch (error) {
     console.log(error);
     res.status(500).json({ message: "Error occurred" });
@@ -219,8 +220,7 @@ exports.homePage = async (req, res) => {
 
     const mostSold = await Product.find({}).sort({ sold: 1 }).limit(7);
 
-    const promoted = await Product
-      .find({ promotion: { $gt: 0 } })
+    const promoted = await Product.find({ promotion: { $gt: 0 } })
       .sort({ sold: 1 })
       .limit(7);
     const Shoe = await Product.find({
