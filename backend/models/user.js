@@ -87,10 +87,6 @@ const userSchema = new mongoose.Schema({
 
       name: {
         type: String,
-<<<<<<< HEAD
-=======
-        //required: true,
->>>>>>> refs/remotes/origin/main
       },
 
       quantity: {
@@ -104,10 +100,6 @@ const userSchema = new mongoose.Schema({
 
       productId: {
         type: mongoose.Types.ObjectId,
-<<<<<<< HEAD
-=======
-        //required: true,
->>>>>>> refs/remotes/origin/main
       },
     },
   ],
