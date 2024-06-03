@@ -12,6 +12,7 @@ const itemSchema = new mongoose.Schema({
       required: true,
     },
   ],
+
   price: {
     type: Number,
     required: true,
@@ -73,7 +74,6 @@ const itemSchema = new mongoose.Schema({
 
           inStock: {
             type: Number,
-            required: true,
             default: 1,
           },
         },

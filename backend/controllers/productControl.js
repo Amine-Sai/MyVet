@@ -12,12 +12,13 @@ exports.createProduct = async (req, res) => {
       return res.status(401).json({ message: "Unauthorized." });
     const { name, pic, price, category, colors, gender, age, description } =
       req.body;
-
-    const des = description.substring(0, 200);
-    if (description.length > 200) {
-      des += "...";
+    if (!description) des = "";
+    else {
+      const des = description.substring(0, 200);
+      if (description.length > 200) {
+        des += "...";
+      }
     }
-
     const newProduct = new Product({
       name: name,
       pic: pic,
