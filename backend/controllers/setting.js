@@ -123,11 +123,7 @@ exports.updateUser = async (req, res) => {
     if (!user) return res.status(404).json({ message: "User not found." });
   
 
-    const errors = validationResult(req);
-    if (!errors.isEmpty()) {
-      return res.status(400).json({ errors: errors.array() });
-    }
-
+   
     const { email, firstName, lastName, password, pic } = req.body;
 
     if (email) user.email = email;
