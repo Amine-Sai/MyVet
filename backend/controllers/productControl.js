@@ -48,8 +48,9 @@ exports.getProduct = async (req, res) => {
 
     const owner = await User.findById(product.sellerid);
     if (!owner) return res.status(500).json({ message: "Error occurred" });
-    const { pic, name } = owner;
-    const seller = { name, pic };
+    const { pic, firstName, lastName } = owner;
+
+    const seller = { firstName, lastName, pic };
 
     let heart = false;
     if (req.userId) {
