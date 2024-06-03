@@ -85,8 +85,6 @@ const itemSchema = new mongoose.Schema({
     },
   ],
 
-  
-
   comments: [
     {
       user: {
@@ -123,6 +121,12 @@ const itemSchema = new mongoose.Schema({
   sold: {
     type: Number,
     default: 0,
+  },
+
+  description: {
+    type: String,
+    default: "",
+    maxlength: 200,
   },
 });
 

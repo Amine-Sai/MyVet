@@ -18,7 +18,7 @@ const emailVerification = async (email, code) => {
   const mailOptions = {
     from: `${process.env.ADMIN_EMAIL}`,
     to: email,
-    subject: "Reset password",
+    subject: "Request to make a new admin",
     text: `Your verification code is: ${code}`,
   };
 

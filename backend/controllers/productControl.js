@@ -10,7 +10,14 @@ exports.createProduct = async (req, res) => {
     const user = await User.findById({ _id: userId });
     if (!user || user.isSeller == false)
       return res.status(401).json({ message: "Unauthorized." });
-    const { name, pic, price, category, colors, gender, age } = req.body;
+    const { name, pic, price, category, colors, gender, age, description } =
+      req.body;
+
+    const des = description.substring(0, 200);
+    if (description.length > 200) {
+      des += "...";
+    }
+
     const newProduct = new Product({
       name: name,
       pic: pic,
@@ -20,6 +27,7 @@ exports.createProduct = async (req, res) => {
       sellerid: userId,
       gender: gender,
       age: age,
+      description: des,
     });
 
     await newProduct.save();
