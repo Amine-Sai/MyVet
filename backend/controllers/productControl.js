@@ -12,6 +12,9 @@ exports.createProduct = async (req, res) => {
       return res.status(401).json({ message: "Unauthorized." });
     const { name, pic, price, category, colors, gender, age, description } =
       req.body;
+
+    console.log(pic, colors, description);
+
     if (!description) des = "";
     else {
       const des = description.substring(0, 200);
@@ -19,6 +22,9 @@ exports.createProduct = async (req, res) => {
         des += "...";
       }
     }
+
+    if (!colors) colors = [];
+
     const newProduct = new Product({
       name: name,
       pic: pic,
