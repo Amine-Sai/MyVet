@@ -6,6 +6,7 @@ const {
   updateProduct,
   delProduct,
   homePage,
+  addComment,
 } = require("../controllers/productControl");
 const cookieAuth = require("../middleware/cookieAuth");
 
@@ -17,6 +18,9 @@ router.get("/search", searchFilter);
 
 // load product page
 router.get("/product/:productId", cookieAuth, getProduct);
+
+//post a comment
+router.post("/product/comment/:productId", cookieAuth, addComment);
 
 //update a single product
 router.put("/product/:productId", cookieAuth, updateProduct);

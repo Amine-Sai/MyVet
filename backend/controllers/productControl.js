@@ -190,48 +190,43 @@ exports.delProduct = async (req, res) => {
 
 exports.addComment = async (req, res) => {
   try {
-    const userId = req;
-    if (!userId)
+    if (!req.userId || !req.params)
       return res
         .status(401)
         .json({ message: "You must be logged in to comment." });
-    else {
-      let product = await Product.findById(req.params);
-      if (!product) {
-        res.status(404).json({ message: "product not found!" });
-        return;
-      }
-      const { rating, content } = req.body;
-      if (!rating) return;
-      product.comments.push({
-        user: userId,
-        content: content,
-        rating: rating || 0,
-      });
-      productRating(product);
-      await product.save();
+
+    let product = await Product.findById(req.params.productId);
+    if (!product) {
+      return res.status(404).json({ message: "product not found!" });
     }
+    const { rating, content } = req.body;
+    if (!rating) return;
+    product.comments.push({
+      user: req.userId,
+      content: content,
+      rating: rating || 0,
+    });
+    productRating(product);
+    res.status(200).json({ message: "Comment added!" });
   } catch (error) {
+    console.log(error);
     res.status(500).json({ message: error });
   }
 };
 
-exports.productRating = async (product) => {
-  try {
-    let sumOfRatings = 0;
-    const { productId } = req.body;
-    let prod = Product.findById(productId);
-    let count = prod.comments.length();
-    for (const comments of prod.comments) {
-      if (comments.rating > 0) sumOfRatings += prod.comment.rating;
-    }
-    const avgRating = Math.round(sumOfRatings / count);
+const productRating = async (product) => {
+  if (product.comments.length < 1) return;
 
-    prod.rating = avgRating;
-    await product.save();
-  } catch (error) {
-    res.status(500).json({ message: error.message });
+  let sumOfRatings = 0;
+  let count = product.comments.length;
+
+  for (const comments of product.comments) {
+    if (comments.rating > 0) sumOfRatings += comments.rating;
   }
+  const avgRating = Math.round(sumOfRatings / count);
+
+  product.rating = avgRating;
+  await product.save();
 };
 
 exports.homePage = async (req, res) => {
