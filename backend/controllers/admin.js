@@ -6,7 +6,7 @@ const admin = require("../models/admin");
 const Math = require("mathjs");
 require("dotenv").config();
 
-const emailVerification = async (email, code) => {
+emailVerification = async (email, code) => {
   const transporterr = nodemailer.createTransport({
     service: "Gmail",
     auth: {
