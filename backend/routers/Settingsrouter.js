@@ -10,5 +10,5 @@ router.post("/Settings/update-Firstname", cookieAuth,updateFirstname);
 router.post("/Settings/update-Lastname", cookieAuth, updateLastname);
 router.post("/Settings/update-Pic", cookieAuth, updatePic);
 router.post("/Settings/update-Password", cookieAuth, updatePassword);*/
-router.put("/Settings", cookieAuth, updateUser);
+router.patch("/Settings", cookieAuth, updateUser);
 module.exports = router;

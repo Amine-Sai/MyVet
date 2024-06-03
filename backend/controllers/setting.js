@@ -2,7 +2,7 @@ const express = require("express");
 //const router = express.Router();
 const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
-const { validationResult } = require("express-validator");
+//const { validationResult } = require("express-validator");
 const mongoose = require("mongoose");
 const User = require("../models/user");
 //const auth = require("../middleware/auth");
@@ -119,19 +119,15 @@ exports.updatePic = async (req, res) => {
 
 exports.updateUser = async (req, res) => {
   try {
-    const user = await User.findById(userId);
-    if (!user) return res.status(404).json({ message: "User not found." });
-  
-
-    const errors = validationResult(req);
-    if (!errors.isEmpty()) {
-      return res.status(400).json({ errors: errors.array() });
-    }
-
-    const { email, firstName, lastName, password, pic } = req.body;
+    if (!req.userId)
+      return res.status(401).json({ message: "you must be logged in." });
+    const user = await User.findById(req.userId);
+   console.log(req.userId);
+   console.log(user.firstName );
+    const { firstName } = req.body;
 
     if (email) user.email = email;
-    if (firstName) user.firstName = firstName;
+   if (firstName) user.firstName = firstName;
     if (lastName) user.lastName = lastName;
     if (password) {
       const salt = await bcrypt.genSalt(10);
@@ -141,7 +137,9 @@ exports.updateUser = async (req, res) => {
     }
     if (pic) user.pic = pic;
 
-    await user.save();
+
+    
+   await user.save();
     res.status(200).json({ message: "User information updated successfully" });
   } catch (error) {
     console.error(error);
