@@ -87,7 +87,6 @@ const userSchema = new mongoose.Schema({
 
       name: {
         type: String,
-        required: true,
       },
 
       quantity: {
@@ -101,7 +100,6 @@ const userSchema = new mongoose.Schema({
 
       productId: {
         type: mongoose.Types.ObjectId,
-        required: true,
       },
     },
   ],

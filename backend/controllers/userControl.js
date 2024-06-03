@@ -2,8 +2,9 @@ const User = require("../models/user");
 
 exports.userPage = async (req, res) => {
   try {
-    const { userId } = req.params;
-    const user = await User.findById(userId);
+    if (!req.params)
+      return res.status(401).json({ message: "you must be logged in." });
+    const user = await User.findById(req.userId);
     if (!user) {
       return res.status(404).json({ message: "User not found." });
     }
@@ -39,8 +40,10 @@ exports.myArticles = async (req, res) => {
 
 exports.upgradeRequest = async (req, res) => {
   try {
-    const { userId } = req;
-    const user = await User.findById(userId);
+    if (!req.userId)
+      return res.status(401).json({ message: "you must be logged in." });
+    const user = await User.findById(req.userId);
+
     if (!user) return res.status(404).json({ message: "User not found." });
     if (user.upgradeRequest)
       return res

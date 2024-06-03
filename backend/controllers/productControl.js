@@ -1,19 +1,19 @@
-const { prod } = require("mathjs");
 const Product = require("../models/products");
 const User = require("../models/user");
 
 exports.createProduct = async (req, res) => {
   try {
     if (!req.params.sellerId)
+      return res.status(404).json({ message: "Page not found." });
+    const user = await User.findById(req.userId);
+    if (!user || !user.isSeller)
       return res.status(401).json({ message: "Unauthorized." });
-    const { userId } = req;
-    const user = await User.findById({ _id: userId });
-    if (!user || user.isSeller == false)
-      return res.status(401).json({ message: "Unauthorized." });
-    const { name, pic, price, category, colors, gender, age, description } =
+    let { name, pic, price, category, colors, gender, age, description } =
       req.body;
-
-    console.log(pic, colors, description);
+    if (!name || !pic || !price || !age || !gender)
+      return res
+        .status(501)
+        .json({ message: "Please provide the required info for the product." });
 
     if (!description) des = "";
     else {
@@ -30,14 +30,14 @@ exports.createProduct = async (req, res) => {
       pic: pic,
       price: price,
       category: category,
-      colors: colors,
-      sellerid: userId,
-      gender: gender,
       age: age,
+      colors: colors,
+      sellerid: req.userId,
+      gender: gender,
       description: des,
     });
-
     await newProduct.save();
+
     user.products.push({
       _id: newProduct._id,
       name: name,
@@ -160,39 +160,43 @@ exports.updateProduct = async (req, res) => {
 
 exports.delProduct = async (req, res) => {
   try {
-    if (req.userID || req.params.productId)
+    if (!req.userId || !req.params.productId)
       return res.status(404).json({ message: "page not found" });
-    const { userId } = req;
 
-    const deleted = await Product.findOneAndDelete({
-      _id: req.params.productId,
-      sellerId: userId,
+    const { productId } = req.params;
+    const deleted = await Product.findByIdAndDelete({
+      _id: productId,
+      sellerid: req.userId,
     });
 
     if (deleted)
-      await User.updateOne(
-        { _id: userId },
-        {
-          $pullAll: {
-            products: [{ _id: req.params.productId }],
+      await User.findByIdAndUpdate(req.userId, {
+        $pull: {
+          products: {
+            _id: productId,
           },
-        }
-      );
+        },
+      });
     else
       return res
         .status(500)
         .json({ err: "not authorized to delete this product" });
+    res.status(200).json({ message: "Product deleted successfully!" });
   } catch (error) {
-    res.status(500).json({ message: error });
+    console.log(error);
+    res.status(500).json({ message: "error occured" });
   }
 };
 
 exports.addComment = async (req, res) => {
   try {
     const userId = req;
-    if (!userId) return;
+    if (!userId)
+      return res
+        .status(401)
+        .json({ message: "You must be logged in to comment." });
     else {
-      let product = await Product.findById({ _id: req.params });
+      let product = await Product.findById(req.params);
       if (!product) {
         res.status(404).json({ message: "product not found!" });
         return;
@@ -233,7 +237,6 @@ exports.productRating = async (product) => {
 exports.homePage = async (req, res) => {
   try {
     // hard coded incoming !!
-
     const mostSold = await Product.find({}).sort({ sold: 1 }).limit(7);
 
     const promoted = await Product.find({ promotion: { $gt: 0 } })
