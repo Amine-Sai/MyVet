@@ -167,3 +167,55 @@ exports.removeFromCart = async (req, res) => {
     return res.status(400).json({ message: "Error occurred" });
   }
 };
+
+
+exports.buyFromCart = async (req, res) => {
+  try {
+    const userId = req.userId;
+    if (!userId) return res.status(401).json({ message: "You must be logged in." });
+
+    const user = await User.findById(userId);
+    if (!user || user.Cart.length < 1) return res.status(404).json({ message: "Cart is empty." });
+
+    let totalPrice = 0;
+
+    // Loop through each item in the user's cart
+    for (const cartItem of user.Cart) {
+      const product = await Product.findById(cartItem.productId);
+      if (!product) return res.status(404).json({ message: `Product with ID ${cartItem.productId} not found.` });
+      console.log(product)
+      // Find the specific color and size of the product
+      const productColor = await product.colors.find(color => color.color === cartItem.colors.color);
+      console.log(productColor)
+      if (!productColor) return res.status(404).json({ message: `Color ${cartItem.colors.color} not found for product ${product.name}.` });
+
+      const productSize = productColor.sizes.find(size => 
+        size.value === cartItem.colors.sizes.value && size.shoeSize === cartItem.colors.sizes.ShoeSize);
+        //console.log(productSize)
+      if (!productSize) return res.status(404).json({ message: `Size ${cartItem.colors.sizes.value} not found for product ${product.name}.` });
+
+      // Check if there is enough stock
+      if (productSize.inStock < cartItem.quantity) {
+        return res.status(400).json({ message: `Insufficient stock for product ${product.name}. Available stock: ${productSize.inStock}` });
+      }
+
+      // Calculate total price
+      totalPrice += product.price * cartItem.quantity;
+
+      // Decrease stock quantity
+      productSize.inStock -= cartItem.quantity;
+    }
+
+    // Save the changes to all products
+    await Promise.all(user.Cart.map(cartItem => Product.findById(cartItem.productId).then(product => product.save())));
+
+    // Clear the user's cart after purchase
+    user.Cart = [];
+    await user.save();
+
+    res.status(200).json({ message: "Purchase successful", totalPrice: totalPrice });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ message: "Internal server error" });
+  }
+};
