@@ -18,6 +18,6 @@ module.exports = async (req, res, next) => {
     }
   } else {
     req.userId = null;
-    next();
   }
+  next();
 };
