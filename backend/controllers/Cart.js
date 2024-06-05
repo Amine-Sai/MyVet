@@ -29,7 +29,23 @@ exports.getCart = async (req, res) => {
     );
     Carts = Carts.filter(Boolean);
 
-    return res.status(200).json({ Cart: Carts });
+
+
+
+
+    let totalPrice = 0;
+
+    // Loop through each item in the user's cart
+    for (const cartItem of user.Cart) {
+      const product = await Product.findById(cartItem.productId);
+     // if (!productSize) return res.status(404).json({ message: `Size ${cartItem.colors.sizes.value} not found for product ${product.name}.` });
+      totalPrice += product.price * cartItem.quantity;
+      // Check if there is enough stock
+     // if (productSize.inStock < cartItem.quantity) {
+        //res.status(400).json({ message: `Insufficient stock for product ${product.name}. Available stock: ${productSize.inStock}` });
+      }
+
+    return res.status(200).json({ Cart: Carts ,  totalPrice :  totalPrice  });
   } catch (error) {
     res.status(500).json({ message: "Error occured." });
   }
