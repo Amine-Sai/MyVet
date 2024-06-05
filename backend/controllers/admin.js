@@ -196,6 +196,7 @@ exports.editHome = async (req, res) => {
       };
       products[edit[i].indice] = newProduct;
     }
+    res.status(200).json({ message: "Home Updated." });
   } catch (error) {
     res.status(500).json({ message: "Error occured" });
   }

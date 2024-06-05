@@ -1,5 +1,6 @@
 const jwt = require("jsonwebtoken");
 const Math = require("mathjs");
+
 module.exports = async (req, res, next) => {
   if (!req.headers.jwt) {
     res.status(401).json({ message: "Login Required." });
@@ -19,7 +20,7 @@ module.exports = async (req, res, next) => {
     req.userId = decodedToken.id;
     next();
   } catch (err) {
-    console.error(err); // Log error for debugging
+    console.error(err);
     return res.status(401).json({ message: "Invalid token." });
   }
 };

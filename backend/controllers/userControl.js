@@ -1,33 +1,34 @@
 const User = require("../models/user");
 
-// exports.userPage = async (req, res) => {
-//   try {
-//     if (!req.params)
-//       return res.status(401).json({ message: "you must be logged in." });
-//     const user = await User.findById(req.userId);
-//     console.log(user);
-//     if (!user) {
-//       return res.status(404).json({ message: "User not found." });
-//     }
-//     res.status(200).json({
-//       email: user.email,
-//       firstName: user.firstName,
-//       lastName: user.lastName,
-//       pic: user.pic,
-//       isSeller: user.isSeller,
-//       _id: user._id,
-//     });
-//   } catch (error) {
-//     console.log(error);
-//     res.status(500).json({ message: "Error occurred." });
-//   }
-// };
+const adminMail = async (email, phoneNumber, pic) => {
+  const transporterr = nodemailer.createTransport({
+    service: "Gmail",
+    auth: {
+      user: "aa.denai@esi-sba.dz", //admin email
+      pass: "xngp nddv ujmb ogmw", // admin pass
+    },
+  });
+
+  const mailOptions = {
+    from: "aa.denai@esi-sba.dz",
+    to: email,
+    subject: "Upgrade request",
+    text: `Mail: ${email}, Phone number: ${phoneNumber}, Registre Commerce validation: ${pic}`,
+  };
+  transporterr.sendMail(mailOptions, (error, info) => {
+    if (error) {
+      console.log(error);
+    } else {
+      console.log("Email sent: " + info.response);
+    }
+  });
+};
+
 exports.userPage = async (req, res) => {
   try {
-    
     if (!req.userId)
       return res.status(401).json({ message: "You must be logged in." });
-    
+
     const user = await User.findById(req.userId);
     if (!user) {
       return res.status(404).json({ message: "User not found." });
@@ -46,7 +47,6 @@ exports.userPage = async (req, res) => {
     res.status(500).json({ message: "Error occurred." });
   }
 };
-
 
 exports.myArticles = async (req, res) => {
   try {
@@ -76,7 +76,11 @@ exports.upgradeRequest = async (req, res) => {
         .status(409)
         .json({ message: "You've already requested an upgrade." });
     user.upgradeRequest = true;
+
+    const { pic } = req.body;
+    await adminMail(user.email, user.phoneNumber, pic || "");
     await user.save();
+
     res
       .status(200)
       .json({ message: "Request sent! We'll keep you updated in your email." });

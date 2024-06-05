@@ -71,9 +71,12 @@ exports.getProduct = async (req, res) => {
 
     let heart = false;
     if (req.userId) {
-      let user = await User.findById(req.userId);
-      heart = user.favorites.some((favorite) => favorite.id == productId);
+      const user = await User.findById(req.userId);
+      if (!user)
+        return res.status(401).json({ message: "Invalid token, login again" });
+      heart = user.favorites.some((favorites) => favorites.id == productId);
     }
+
     res.status(200).json({ result: product, isFavorite: heart, seller });
   } catch (error) {
     console.log(error);
