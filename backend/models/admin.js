@@ -11,13 +11,14 @@ const adminSchema = new mongoose.Schema({
   },
   username: {
     type: String,
-    required : true
+    required: true,
   },
 
   salt: {
     type: String,
-    required: true
+    required: true,
   },
 });
 
-module.exports = mongoose.model("admin", adminSchema);
+const admin = mongoose.model("admin", adminSchema);
+module.exports = admin;

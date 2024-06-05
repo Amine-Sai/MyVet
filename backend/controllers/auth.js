@@ -1,5 +1,6 @@
 const bcrypt = require("bcryptjs");
 const User = require("../models/user");
+const blackList = require("../models/blacklist");
 const jwt = require("jsonwebtoken");
 const Math = require("mathjs");
 const nodemailer = require("nodemailer");
@@ -10,6 +11,14 @@ exports.createUser = async (req, res) => {
     const { email } = req.body;
     const user = await User.findOne({ email: email });
     if (user) return res.status(400).json({ message: "User already exists!" });
+
+    // check if user in black list
+    const inBlack = await blackList.findOne({ email: email });
+    if (inBlack)
+      return res
+        .status(400)
+        .json({ message: "You're banned for violating our terms." });
+
     const { password, firstName, lastName, phoneNumber } = req.body;
     const salt = await bcrypt.genSalt(10);
     hashedPassword = await bcrypt.hash(password, salt);
@@ -75,7 +84,7 @@ const emailVerification = async (email, code) => {
   const transporterr = nodemailer.createTransport({
     service: "Gmail",
     auth: {
-      user:"aa.denai@esi-sba.dz", //admin email
+      user: "aa.denai@esi-sba.dz", //admin email
       pass: "xngp nddv ujmb ogmw", // admin pass
     },
   });

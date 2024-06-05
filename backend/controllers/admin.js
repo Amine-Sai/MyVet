@@ -1,12 +1,12 @@
 const admin = require("../models/admin");
 const User = require("../models/user");
-const bcrypt = require("bcryptjs");
 const Product = require("../models/products");
-const admin = require("../models/admin");
+const blackList = require("../models/blacklist");
+const bcrypt = require("bcryptjs");
 const Math = require("mathjs");
 require("dotenv").config();
 
-emailVerification = async (email, code) => {
+sendMail = async (email, code) => {
   const transporterr = nodemailer.createTransport({
     service: "Gmail",
     auth: {
@@ -41,7 +41,7 @@ exports.newAdmin = async (req, res) => {
     const user = await admin.findOne({ email: email });
     if (user) return res.status(400).json({ message: "User already exists!" });
     const code = generateOTP();
-    await emailVerification(email, code);
+    await sendMail(email, code);
     res.status(200).json({ message: "Email sent!" });
   } catch (error) {
     res.status(500).json({ message: "Error occured" });
@@ -73,6 +73,13 @@ exports.createAdmin = async (req, res) => {
     res.status(503).json({ message: "Error occured." });
   }
 };
+
+// exports.searchUser = async (req, res) =>{
+//   try {
+//     const {email}
+//   }
+// }
+
 exports.adminLogin = async (req, res) => {
   try {
     const { email } = req.body;
@@ -158,7 +165,15 @@ exports.deleteUser = async (req, res) => {
     const userId = req.params;
     const user = await User.findByIdAndDelete(userId);
     if (!user) return res.status(404).json({ msg: "User not found" });
-    await Product.deleteMany({ sellerId: user._id });
+    // add user to black list
+    const blacklist = new blackList({
+      email: user.email,
+      phoneNumber: user.phoneNumber,
+      reason: req.body.reason || "Violating our terms",
+    });
+    await blacklist.save();
+
+    if (user.isSeller) await Product.deleteMany({ sellerId: user._id });
     res.status(200).json({ message: "user deleted" });
   } catch (error) {
     res.status(500).json({ message: "Error occured" });
