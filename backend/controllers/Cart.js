@@ -48,7 +48,8 @@ exports.addtoCart = async (req, res) => {
 
     const user = await User.findById(userId);
 
-    if (!user) return res.status(404).json({ message: "User not found" });
+    if (!user || user.Cart.length < 1)
+      return res.status(404).json({ message: "feature not available" });
 
     const product = await Product.findById(productId);
     if (!product)
@@ -59,7 +60,7 @@ exports.addtoCart = async (req, res) => {
         cartItem.productId == productId &&
         cartItem.colors.color == colors.color &&
         cartItem.colors.sizes.value == colors.sizes.value &&
-        cartItem.colors.sizes.ShoeSize == colors.sizes.ShoeSize
+        cartItem.colors.sizes.shoeSize == colors.sizes.ShoeSize
     );
     if (!inCart) {
       user.Cart.push({
@@ -129,7 +130,7 @@ exports.buyFromCart = async (req, res) => {
       const product = await Product.findById(cartItem.productId);
       if (!product)
         return res.status(404).json({
-          message: `Product with ID ${cartItem.productId} not found.`,
+          message: `Product ${cartItem.productId} not found.`,
         });
       // Find the specific color and size of the product
       const productColor = product.colors.find(
