@@ -7,7 +7,7 @@ const {
 const cookieAuth = require("../middleware/cookieAuth");
 
 // user account
-router.get("/account/:userId", userPage);
+router.get("/account/:userId",cookieAuth, userPage);
 router.post("/account/upgraderequest", cookieAuth, upgradeRequest);
 router.get("/articles", cookieAuth, myArticles);
 

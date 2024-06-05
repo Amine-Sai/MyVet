@@ -113,6 +113,10 @@ const userSchema = new mongoose.Schema({
         type: Date,
         default: Date.now(),
       },
+      pic: {
+        type: String,
+        required: true,
+      },
 
       phoneNumber: {
         type: String,
@@ -140,6 +144,7 @@ const userSchema = new mongoose.Schema({
       name: {
         type: String,
       },
+
       productId: {
         type: mongoose.Types.ObjectId,
       },
@@ -154,6 +159,14 @@ const userSchema = new mongoose.Schema({
       size: {
         type: String,
         required: true,
+      },
+      shoeSize: {
+        type: Number,
+        default: 0,
+        max: 45,
+      },
+      price: {
+        type: Number,
       },
       status: {
         type: String,
