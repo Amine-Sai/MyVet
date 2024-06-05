@@ -1,13 +1,38 @@
 const User = require("../models/user");
 
+// exports.userPage = async (req, res) => {
+//   try {
+//     if (!req.params)
+//       return res.status(401).json({ message: "you must be logged in." });
+//     const user = await User.findById(req.userId);
+//     console.log(user);
+//     if (!user) {
+//       return res.status(404).json({ message: "User not found." });
+//     }
+//     res.status(200).json({
+//       email: user.email,
+//       firstName: user.firstName,
+//       lastName: user.lastName,
+//       pic: user.pic,
+//       isSeller: user.isSeller,
+//       _id: user._id,
+//     });
+//   } catch (error) {
+//     console.log(error);
+//     res.status(500).json({ message: "Error occurred." });
+//   }
+// };
 exports.userPage = async (req, res) => {
   try {
-    if (!req.params)
-      return res.status(401).json({ message: "you must be logged in." });
+    console.log(req.userId);
+    if (!req.userId)
+      return res.status(401).json({ message: "You must be logged in." });
+    
     const user = await User.findById(req.userId);
     if (!user) {
       return res.status(404).json({ message: "User not found." });
     }
+
     res.status(200).json({
       email: user.email,
       firstName: user.firstName,
@@ -17,10 +42,11 @@ exports.userPage = async (req, res) => {
       _id: user._id,
     });
   } catch (error) {
-    console.log(error);
+    console.error(error);
     res.status(500).json({ message: "Error occurred." });
   }
 };
+
 
 exports.myArticles = async (req, res) => {
   try {

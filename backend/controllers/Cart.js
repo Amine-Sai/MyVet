@@ -155,6 +155,17 @@ exports.buyFromCart = async (req, res) => {
           size.shoeSize == cartItem.colors.sizes.shoeSize &&
           size.value == cartItem.colors.sizes.value
       );
+      user.myOrders.push({
+        name: cartItem.name,
+        productId: cartItem.productId,
+        pic: cartItem.pic, // Assuming the cart item has the pic
+        price:product.price * (1 - product.promotion) * cartItem.quantity,
+        status: "pending",
+        date: new Date(), // Current date as the default value
+        color: cartItem.colors.color,
+        size: cartItem.colors.sizes.value,
+        shoeSize : cartItem.colors.sizes.shoeSize,
+      });
       size.inStock -= cartItem.quantity;
 
       // Calculate total price
