@@ -42,7 +42,8 @@ exports.addtoCart = async (req, res) => {
     const { productId } = req.params;
     const { colors, quantity } = req.body;
 
-    if (!colors) return res.status(500).json({ message: "Bad request." });
+    if (!colors || !colors.color || !colors.sizes)
+      return res.status(500).json({ message: "Bad request." });
 
     if (quantity < 1 || !quantity) quantity = 1;
 
@@ -59,17 +60,26 @@ exports.addtoCart = async (req, res) => {
         cartItem.productId == productId &&
         cartItem.colors.color == colors.color &&
         cartItem.colors.sizes.value == colors.sizes.value &&
-        cartItem.colors.sizes.ShoeSize == colors.sizes.ShoeSize
+        cartItem.colors.sizes.shoeSize == colors.sizes.shoeSize
     );
     if (!inCart) {
       user.Cart.push({
         quantity: quantity,
         productId: productId,
         colors: colors,
+        price: product.price,
+        name: product.name,
+        pic: product.pic[0],
       });
     } else {
       user.Cart.map((cartItem) => {
-        if (cartItem.productId == productId) cartItem.quantity += quantity;
+        if (
+          cartItem.productId == productId &&
+          cartItem.colors.color == colors.color &&
+          cartItem.colors.sizes.value == colors.sizes.value &&
+          cartItem.colors.sizes.shoeSize == colors.sizes.shoeSize
+        )
+          cartItem.quantity += quantity;
         return cartItem;
       });
     }
@@ -104,8 +114,9 @@ exports.removeFromCart = async (req, res) => {
       user.Cart.splice(productIndex, 1);
       await user.save();
       return res.status(200).json({ message: "Product removed from cart" });
+    } else {
+      return res.status(404).json({ message: "Product not found in cart" });
     }
-    return res.status(404).json({ message: "Product not found in cart" });
   } catch (err) {
     console.log(err);
     return res.status(400).json({ message: "Error occurred" });
