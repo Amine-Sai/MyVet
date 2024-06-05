@@ -76,7 +76,7 @@ exports.getmyOrders = async (req, res) => {
           : null;
       })
     );
-   orders = orders.filter((prod) => prod !== null);
+   orders = orders.filter((ord) => ord!== null);
     
     return res.status(200).json({ myOrders: orders });
   } catch (error) {
