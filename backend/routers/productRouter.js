@@ -9,6 +9,7 @@ const {
   addComment,
 } = require("../controllers/productControl");
 const cookieAuth = require("../middleware/cookieAuth");
+const softAuth = require("../middleware/softAuth");
 
 // create a product
 router.post("/:sellerId", cookieAuth, createProduct);
@@ -17,7 +18,7 @@ router.post("/:sellerId", cookieAuth, createProduct);
 router.get("/search", searchFilter);
 
 // load product page
-router.get("/product/:productId", cookieAuth, getProduct);
+router.get("/product/:productId", softAuth, getProduct);
 
 //post a comment
 router.post("/product/comment/:productId", cookieAuth, addComment);
