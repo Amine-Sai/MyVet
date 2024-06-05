@@ -97,16 +97,15 @@ exports.removeFromCart = async (req, res) => {
         cartItem.productId == productId &&
         cartItem.colors.color == colors.color &&
         cartItem.colors.sizes.value == colors.sizes.value &&
-        cartItem.colors.sizes.ShoeSize == colors.sizes.ShoeSize
+        cartItem.colors.sizes.shoeSize == colors.sizes.shoeSize
     );
 
     if (productIndex !== -1) {
       user.Cart.splice(productIndex, 1);
       await user.save();
       return res.status(200).json({ message: "Product removed from cart" });
-    } else {
-      return res.status(404).json({ message: "Product not found in cart" });
     }
+    return res.status(404).json({ message: "Product not found in cart" });
   } catch (err) {
     console.log(err);
     return res.status(400).json({ message: "Error occurred" });
