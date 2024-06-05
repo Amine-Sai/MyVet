@@ -95,7 +95,7 @@ const itemSchema = new mongoose.Schema({
       content: {
         type: String,
         max: 255,
-        min: 4,
+        min: 2,
       },
       rating: {
         type: Number,
@@ -103,6 +103,14 @@ const itemSchema = new mongoose.Schema({
         min: 1,
         max: 5,
         default: 0,
+      },
+      date: {
+        type: Date,
+        default: Date.now(),
+      },
+      name: {
+        type: String,
+        required: true,
       },
     },
   ],

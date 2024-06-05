@@ -70,10 +70,12 @@ exports.getProduct = async (req, res) => {
     const seller = { firstName, lastName, pic };
 
     let heart = false;
+    console.log(req.userId);
     if (req.userId) {
       const user = await User.findById(req.userId);
       if (!user)
         return res.status(401).json({ message: "Invalid token, login again" });
+      console.log(user.favorites);
       heart = user.favorites.some((favorites) => favorites.id == productId);
     }
 
@@ -195,10 +197,15 @@ exports.delProduct = async (req, res) => {
 
 exports.addComment = async (req, res) => {
   try {
-    if (!req.userId || !req.params)
+    if (!req.userId)
       return res
         .status(401)
         .json({ message: "You must be logged in to comment." });
+
+    if (!req.params) return res.status(500).json({ message: "Bad request" });
+
+    const user = User.findById(req.userId);
+    if (!user) return res.status(401).json({ message: "Unauthorized." });
 
     let product = await Product.findById(req.params.productId);
     if (!product) {
@@ -207,9 +214,11 @@ exports.addComment = async (req, res) => {
     const { rating, content } = req.body;
     if (!rating) return;
     product.comments.push({
+      name: user.firstName + user.lastName,
+      date: Date.now(),
       user: req.userId,
       content: content,
-      rating: rating || 0,
+      rating: rating,
     });
     productRating(product);
     res.status(200).json({ message: "Comment added!" });

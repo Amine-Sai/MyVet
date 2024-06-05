@@ -7,6 +7,7 @@ const {
   adminLogin,
   deleteUser,
   upgradeToSeller,
+  sellerRequests,
 } = require("../controllers/admin");
 
 const { getProduct, homePage } = require("../controllers/productControl");
@@ -27,7 +28,11 @@ router.delete("/account/:userId", adminAuth, deleteUser);
 // upgrade to seller
 router.put("/account/:userId", adminAuth, upgradeToSeller);
 
+// seller request
+router.get("/requests", adminAuth, sellerRequests);
+
 /// PRODUCT MANAGEMENT
+
 // search & filter
 router.get("/search", searchFilter);
 

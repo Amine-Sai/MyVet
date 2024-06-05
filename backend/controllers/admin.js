@@ -214,3 +214,10 @@ exports.upgradeToSeller = async (req, res) => {
     res.status(500).json({ message: "Error occured" });
   }
 };
+
+exports.sellerRequests = async (req, res) => {
+  try {
+    const user = User.find({ upgradeRequest });
+    res.status(200).json({ users: user });
+  } catch (error) {}
+};
