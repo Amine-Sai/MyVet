@@ -123,139 +123,67 @@ exports.removeFromCart = async (req, res) => {
   }
 };
 
-// exports.buyFromCart = async (req, res) => {
-//   try {
-//     const userId = req.userId;
-//     if (!userId)
-//       return res.status(401).json({ message: "You must be logged in." });
-
-//     const user = await User.findById(userId);
-//     if (!user || user.Cart.length < 1)
-//       return res.status(404).json({ message: "Cart is empty." });
-
-//     let totalPrice = 0;
-
-    // Loop through each item in the user's cart
-//     for (const cartItem of user.Cart) {
-//       const product = await Product.findById(cartItem.productId);
-//       if (!product)
-//         return res.status(404).json({
-//           message: `Product with ID ${cartItem.productId} not found.`,
-//         });
-//         console.log(cartItem);
-//       // Find the specific color and size of the product
-//       const productColor = product.colors.find(
-//         (color) =>
-//           color.color == cartItem.colors.color &&
-//           color.sizes.find(
-//             (size) =>
-//               size.shoeSize == cartItem.colors.sizes.shoeSize &&
-//               size.value == cartItem.colors.sizes.value &&
-//               size.inStock > cartItem.quantity
-//           )
-//       );
-//       console.log(productColor);
-//       console.log(cartItem.name);
-//       if (!productColor)
-//         return res.status(404).json({
-//           message: `${cartItem.name} ran out of stock`,
-//         });
-
-//       // Decrease stock quantity
-//       const size = productColor.sizes.find(
-//         (size) =>
-//           size.shoeSize == cartItem.colors.sizes.shoeSize &&
-//           size.value == cartItem.colors.sizes.value
-//       );
-//       user.myOrders.push({
-//         name: cartItem.name,
-//         productId: cartItem.productId,
-//         pic: cartItem.pic, // Assuming the cart item has the pic
-//         price:product.price * (1 - product.promotion) * cartItem.quantity,
-//         status: "pending",
-//         date: new Date(), // Current date as the default value
-//         color: cartItem.colors.color,
-//         size: cartItem.colors.sizes.value,
-//         shoeSize : cartItem.colors.sizes.shoeSize,
-//       });
-//       size.inStock -= cartItem.quantity;
-
-//       // Calculate total price
-//       totalPrice += product.price * (1 - product.promotion) * cartItem.quantity;
-//     }
-//     // Save the changes to all products
-//     await Promise.all(
-//       user.Cart.map((cartItem) =>
-//         Product.findById(cartItem.productId).then((product) => product.save())
-//       )
-//     );
-
-//     // Clear the user's cart after purchase
-//     user.Cart = [];
-//     await user.save();
-//     res
-//       .status(200)
-//       .json({ message: "Purchase successful", totalPrice: totalPrice });
-//   } catch (error) {
-//     console.error(error);
-//     res.status(500).json({ message: "Internal server error" });
-//   }
-// };
-
 exports.buyFromCart = async (req, res) => {
   try {
     const userId = req.userId;
-    if (!userId) return res.status(401).json({ message: "You must be logged in." });
+    if (!userId)
+      return res.status(401).json({ message: "You must be logged in." });
 
     const user = await User.findById(userId);
-    if (!user || user.Cart.length < 1) return res.status(404).json({ message: "Cart is empty." });
+    if (!user || user.Cart.length < 1)
+      return res.status(404).json({ message: "Cart is empty." });
 
     let totalPrice = 0;
 
     // Loop through each item in the user's cart
     for (const cartItem of user.Cart) {
       const product = await Product.findById(cartItem.productId);
-      if (!product) return res.status(404).json({ message: `Product with ID ${cartItem.productId} not found.` });
+      if (!product)
+        return res.status(404).json({
+          message: `Product with ID ${cartItem.productId} not found.`,
+        });
 
-      console.log('CartItem:', cartItem);
-      console.log('Product:', product);
+      const productColor = product.colors.find(
+        (colors) => colors.color == cartItem.colors.color
+      );
 
-      // Find the specific color and size of the product
-      const productColor = product.colors.find((color) => color.color == cartItem.colors.color);
+      console.log("Product:", productColor);
 
       if (!productColor) {
-        return res.status(404).json({ message: `${cartItem.name} ran out of stock` });
+        return res.status(404).json({
+          message: `${product.name} with ${cartItem.colors.color} color ran out of stock`,
+        });
       }
 
       const size = productColor.sizes.find(
         (size) =>
-          size.shoeSize == cartItem.colors.sizes.shoeSize &&
-          size.value == cartItem.colors.sizes.value &&
+          (size.shoeSize == cartItem.colors.sizes.shoeSize ||
+            size.value == cartItem.colors.sizes.value) &&
           size.inStock >= cartItem.quantity
       );
 
-      console.log('ProductColor:', productColor);
-      console.log('Size:', size);
-
       if (!size) {
-        return res.status(404).json({ message: `${cartItem.name} ran out of stock` });
+        return res
+          .status(404)
+          .json({ message: `${product.name} ran out of stock` });
       }
 
       // Decrease stock quantity
       size.inStock -= cartItem.quantity;
 
       // Calculate item price
-      const itemPrice = product.price * (1 - (product.promotion || 0)) * cartItem.quantity;
+      const itemPrice =
+        product.price * (1 - (product.promotion || 0)) * cartItem.quantity;
       totalPrice += itemPrice;
 
       // Add to myOrders
       user.myOrders.push({
         name: cartItem.name,
         productId: cartItem.productId,
-        pic: cartItem.pic, // Assuming the cart item has the pic
+        pic: cartItem.pic || "",
         price: itemPrice,
         status: "pending",
-        date: new Date(), // Current date as the default value
+        date: new Date(),
         color: cartItem.colors.color,
         size: cartItem.colors.sizes.value,
         shoeSize: cartItem.colors.sizes.shoeSize,
@@ -273,7 +201,9 @@ exports.buyFromCart = async (req, res) => {
     user.Cart = [];
     await user.save();
 
-    res.status(200).json({ message: "Purchase successful", totalPrice: totalPrice });
+    res
+      .status(200)
+      .json({ message: "Purchase successful", totalPrice: totalPrice });
   } catch (error) {
     console.error(error);
     res.status(500).json({ message: "Internal server error" });
