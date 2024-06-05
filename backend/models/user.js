@@ -70,7 +70,7 @@ const userSchema = new mongoose.Schema({
             type: String,
             enum: ["S", "M", "L", "XL", "XXL", ""],
           },
-          ShoeSize: {
+          shoeSize: {
             type: Number,
             default: 0,
             max: 45,
