@@ -15,6 +15,7 @@ const reportRouter = require("./routers/reportRouter");
 const Cartrouter = require("./routers/Cartrouter");
 const Settingsrouter = require("./routers/Settingsrouter");
 const ordersrouter = require("./routers/ordersrouter");
+const mysellsrouter = require("./routers/mysellsrouter");
 const app = express();
 const PORT = process.env.PORT || 3000;
 
@@ -32,6 +33,7 @@ app.use("", reportRouter);
 app.use("", Cartrouter);
 app.use("", Settingsrouter);
 app.use("", ordersrouter);
+app.use("", mysellsrouter);
 async function run() {
   try {
     mongoose.connect(process.env.MONGO_CONNECTION);

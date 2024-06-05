@@ -158,7 +158,7 @@ const userSchema = new mongoose.Schema({
       },
       size: {
         type: String,
-        required: true,
+       
       },
       shoeSize: {
         type: Number,

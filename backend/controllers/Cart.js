@@ -176,6 +176,27 @@ exports.buyFromCart = async (req, res) => {
         product.price * (1 - (product.promotion || 0)) * cartItem.quantity;
       totalPrice += itemPrice;
 
+
+      const seller = await User.findById(product.sellerid);
+
+      if (!seller) {
+        return res.status(404).json({ message: `Seller not found for product ${product.name}` });
+      }
+      seller.mySells.push({
+        name: product.name,
+        productId: product._id,
+        pic: product.pic[0], // Assuming the product has the pic array
+        price: itemPrice,
+        status: "pending",
+        date: new Date(), // Current date as the default value
+        color: cartItem.colors[0].color,
+        size: cartItem.colors[0].sizes[0].value,
+        shoeSize: cartItem.colors[0].sizes[0].shoeSize,
+        email: user.email, // Add buyer's email
+        phoneNumber: user.phoneNumber, // Add buyer's phone number
+        quantity: cartItem.quantity,
+      });
+
       // Add to myOrders
       user.myOrders.push({
         name: cartItem.name,
@@ -206,6 +227,6 @@ exports.buyFromCart = async (req, res) => {
       .json({ message: "Purchase successful", totalPrice: totalPrice });
   } catch (error) {
     console.error(error);
-    res.status(500).json({ message: "Internal server error" });
+    res.status(500).json({ message: "Internal server error" + error});
   }
 };
