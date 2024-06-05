@@ -54,7 +54,7 @@ exports.getmyOrders = async (req, res) => {
     if (!req.userId)
       return res.status(404).json({ message: "you must be logged in." });
     const user = await User.findById(req.userId);
-    console.log(user);
+    console.log(user.myOrders);
     if (!user || user.myOrders.length < 1)
       return res.status(404).json({ message: "Page not available" });
 

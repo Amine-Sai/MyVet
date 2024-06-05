@@ -24,7 +24,7 @@ const User = require("../models/user");
 // };
 exports.userPage = async (req, res) => {
   try {
-    console.log(req.userId);
+    
     if (!req.userId)
       return res.status(401).json({ message: "You must be logged in." });
     
