@@ -6,9 +6,10 @@ const {
   editHome,
   adminLogin,
   deleteUser,
-  upgradeToSeller
-
+  upgradeToSeller,
 } = require("../controllers/admin");
+
+const { getProduct, homePage } = require("../controllers/productControl");
 
 const { searchFilter } = require("../controllers/productControl");
 const adminAuth = require("../middleware/adminAuth");
@@ -17,18 +18,16 @@ const adminAuth = require("../middleware/adminAuth");
 router.post(`/admin`, createAdmin);
 
 // admin login
-router.post(`/admin/login`,adminLogin)
+router.post(`/admin/login`, adminLogin);
 
-
-                             /// USER MANAGEMENT
+/// USER MANAGEMENT
 //delete user
-router.delete("/account/:userId", adminAuth, deleteUser)
+router.delete("/account/:userId", adminAuth, deleteUser);
 
-// upgrade to seller 
-router.put("/account/:userId", adminAuth, upgradeToSeller)
+// upgrade to seller
+router.put("/account/:userId", adminAuth, upgradeToSeller);
 
-
-                            /// PRODUCT MANAGEMENT
+/// PRODUCT MANAGEMENT
 // search & filter
 router.get("/search", searchFilter);
 
@@ -48,6 +47,5 @@ router.post("/homepage", adminAuth, editHome);
 // home page for flutter app
 router.get("/home", searchFilter);
 router.post("/homepage", adminAuth, editHome);
-
 
 module.exports = router;

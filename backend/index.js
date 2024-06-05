@@ -6,6 +6,7 @@ const cors = require("cors");
 require("dotenv").config();
 
 // routers
+const adminRouter = require("./routers/adminRouter");
 const productRouter = require("./routers/productRouter");
 const authRouter = require("./routers/authRouter");
 const userRouter = require("./routers/userRouter");
@@ -21,6 +22,7 @@ app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(cors());
 
+app.use("", adminRouter);
 app.use("", authRouter);
 app.use("", productRouter);
 app.use("", userRouter);

@@ -42,6 +42,8 @@ exports.addtoCart = async (req, res) => {
     const { productId } = req.params;
     const { colors, quantity } = req.body;
 
+    if (!colors) return res.status(500).json({ message: "Bad request." });
+
     if (quantity < 1 || !quantity) quantity = 1;
 
     const user = await User.findById(userId);
@@ -54,7 +56,7 @@ exports.addtoCart = async (req, res) => {
 
     const inCart = user.Cart.some(
       (cartItem) =>
-        cartItem.id == productId &&
+        cartItem.productId == productId &&
         cartItem.colors.color == colors.color &&
         cartItem.colors.sizes.value == colors.sizes.value &&
         cartItem.colors.sizes.ShoeSize == colors.sizes.ShoeSize
@@ -71,8 +73,8 @@ exports.addtoCart = async (req, res) => {
         return cartItem;
       });
     }
-    res.status(201).json({ message: `${product.name} added to your cart` });
     await user.save();
+    res.status(201).json({ message: `${product.name} added to your cart` });
   } catch (err) {
     console.log(err);
     res.status(400).json({ message: "Error occurred" });

@@ -112,32 +112,31 @@ exports.updateProduct = async (req, res) => {
   try {
     if (!req.userId)
       return res.status(401).json({ message: "Not authorized." });
+    const admin = Admin.findById(req.userId);
+    if (!admin) return res.status(401).json({ message: "Not authorized." });
 
-
-      
     const update = req.body;
-    const productId = req.params.productId;
 
-    if (update) {
-      const updated = await Product.findOneAndUpdate(
-        { _id: productId, sellerId: userId },
-        { $set: update },
-        { new: true }
-      );
-      const userId = updated.sellerId;
-      if (updated)
-        await User.findByIdAndUpdate(userId, {
-          $addToSet: {
-            items: {
-              pic: updated.pic,
-              price: updated.price,
-              name: updated.name,
-            },
-          },
-        });
-    } else {
+    if (!update)
       return res.status(400).json({ message: "please provide some changes" });
-    }
+
+    const updated = await Product.findByIdAndUpdate(
+      req.params.productId,
+      { $set: update },
+      { new: true }
+    );
+    if (!updated) return res.status(500).json({ message: "error occured." });
+    const userId = updated.sellerid;
+    await User.findByIdAndUpdate(userId, {
+      $addToSet: {
+        items: {
+          pic: updated.pic,
+          price: updated.price,
+          name: updated.name,
+        },
+      },
+    });
+    return res.status(201).json({ message: "Changed applied!" });
   } catch (error) {
     res.status(500).json({ message: error });
   }
