@@ -2,7 +2,8 @@ const Product = require("../models/products");
 const User = require("../models/user");
 
 exports.createProduct = async (req, res) => {
-  try {
+  try { 
+    let des = "";
     if (!req.params.sellerId)
       return res.status(404).json({ message: "Page not found." });
     const user = await User.findById(req.userId);
@@ -17,13 +18,14 @@ exports.createProduct = async (req, res) => {
 
     if (!description) des = "";
     else {
-      const des = description.substring(0, 200);
+       des = description.substring(0, 200);
       if (description.length > 200) {
         des += "...";
       }
     }
 
     if (!colors) colors = [];
+    const colors1 = typeof colors === "string" ? JSON.parse(colors) : colors;
 
     const newProduct = new Product({
       name: name,
@@ -31,7 +33,7 @@ exports.createProduct = async (req, res) => {
       price: price,
       category: category,
       age: age,
-      colors: colors,
+      colors: colors1,
       sellerid: req.userId,
       gender: gender,
       description: des,
@@ -267,6 +269,9 @@ exports.homePage = async (req, res) => {
     const Hidjeb = await Product.find({
       category: { $regex: "Hidjeb", $options: "i" },
     }).sort({ sold: 1 });
+    const Jewelry = await Product.find({
+      category: { $regex: "Jewelry", $options: "i" },
+    }).sort({ sold: 1 });
     res.status(200).json({
       mostSold: mostSold,
       promoted: promoted,
@@ -280,6 +285,7 @@ exports.homePage = async (req, res) => {
       Skirt: Skirt,
       Dress: Dress,
       Hidjeb: Hidjeb,
+      Jewelry : Jewelry ,
     });
   } catch (error) {
     res.status(500).json({ message: "bad request" });
