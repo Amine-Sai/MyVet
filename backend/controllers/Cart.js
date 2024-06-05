@@ -183,8 +183,12 @@ exports.buyFromCart = async (req, res) => {
       const productColor = product.colors.find(
         (color) =>
           color.color == cartItem.colors.color &&
-          color.sizes == cartItem.colors.sizes &&
-          color.sizes.inStock > cartItem.quantity
+          color.sizes.find(
+            (size) =>
+              size.shoeSize == cartItem.colors.sizes.shoeSize &&
+              size.value == cartItem.colors.sizes.value &&
+              size.inStock > cartItem.quantity
+          )
       );
       console.log(productColor);
 
@@ -192,26 +196,18 @@ exports.buyFromCart = async (req, res) => {
         return res.status(404).json({
           message: `${cartItem.name} ran out of stock`,
         });
-      //console.log(productSize)
-      if (!productSize)
-        return res.status(404).json({
-          message: `Size ${cartItem.colors.sizes.value} not found for product ${product.name}.`,
-        });
-
-      // Check if there is enough stock
-      if (productSize.inStock < cartItem.quantity) {
-        return res.status(400).json({
-          message: `Insufficient stock for product ${product.name}. Available stock: ${productSize.inStock}`,
-        });
-      }
-
-      // Calculate total price
-      totalPrice += product.price * cartItem.quantity;
 
       // Decrease stock quantity
-      productSize.inStock -= cartItem.quantity;
-    }
+      const size = productColor.sizes.find(
+        (size) =>
+          size.shoeSize == cartItem.colors.sizes.shoeSize &&
+          size.value == cartItem.colors.sizes.value
+      );
+      size.inStock -= cartItem.quantity;
 
+      // Calculate total price
+      totalPrice += product.price * (1 - product.promotion) * cartItem.quantity;
+    }
     // Save the changes to all products
     await Promise.all(
       user.Cart.map((cartItem) =>
@@ -222,7 +218,6 @@ exports.buyFromCart = async (req, res) => {
     // Clear the user's cart after purchase
     user.Cart = [];
     await user.save();
-
     res
       .status(200)
       .json({ message: "Purchase successful", totalPrice: totalPrice });
