@@ -2,7 +2,9 @@ const jwt = require("jsonwebtoken");
 const Math = require("mathjs");
 module.exports = async (req, res, next) => {
   if (!req.headers.jwt) {
-    return res.status(401).json({ message: "Login Required." });
+    res.status(401).json({ message: "Login Required." });
+    res.end();
+    return;
   }
 
   const token = req.headers.jwt;

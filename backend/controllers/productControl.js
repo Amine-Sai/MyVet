@@ -2,7 +2,7 @@ const Product = require("../models/products");
 const User = require("../models/user");
 
 exports.createProduct = async (req, res) => {
-  try { 
+  try {
     let des = "";
     if (!req.params.sellerId)
       return res.status(404).json({ message: "Page not found." });
@@ -18,7 +18,7 @@ exports.createProduct = async (req, res) => {
 
     if (!description) des = "";
     else {
-       des = description.substring(0, 200);
+      des = description.substring(0, 200);
       if (description.length > 200) {
         des += "...";
       }
@@ -272,7 +272,7 @@ exports.homePage = async (req, res) => {
     const Jewelry = await Product.find({
       category: { $regex: "Jewelry", $options: "i" },
     }).sort({ sold: 1 });
-    
+
     res.status(200).json({
       mostSold: mostSold,
       promoted: promoted,
@@ -286,7 +286,7 @@ exports.homePage = async (req, res) => {
       Skirt: Skirt,
       Dress: Dress,
       Hidjeb: Hidjeb,
-      Jewelry : Jewelry ,
+      Jewelry: Jewelry,
     });
   } catch (error) {
     res.status(500).json({ message: "bad request" });

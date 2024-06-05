@@ -50,24 +50,22 @@ exports.newAdmin = async (req, res) => {
 
 exports.createAdmin = async (req, res) => {
   try {
-    const { email } = req.body;
-    const user = await admin.findOne({ email: email });
-    if (user) {
-      res.status(400).json({ message: "User already exists!" });
-    } else {
-      const { password } = req.body;
-      const salt = await bcrypt.genSalt(10);
-      hashedPassword = await bcrypt.hash(password, salt);
-      const newUser = new admin({
-        email: email,
-        password: hashedPassword,
-        username: "admin",
-        salt: salt,
-      });
+    if (!req.body.email || !req.body.password)
+      return res.status(401).json({ message: "Invalid input." });
+    const user = await Admin.findOne({ email: req.body.email });
+    if (user) return res.status(400).json({ message: "admin already exists!" });
 
-      await newUser.save();
-      res.send({ message: "User registered." });
-    }
+    const salt = await bcrypt.genSalt(10);
+    hashedPassword = await bcrypt.hash(req.body.password, salt);
+    const newUser = new Admin({
+      email: req.body.email,
+      password: hashedPassword,
+      username: "admin",
+      salt: salt,
+    });
+
+    await newUser.save();
+    res.send({ message: "Admin added." });
   } catch (error) {
     console.log(error);
     res.status(503).json({ message: "Error occured." });

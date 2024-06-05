@@ -3,17 +3,13 @@ const router = express.Router();
 const {
   getCart,
   addtoCart,
-  removeFromCart ,
+  removeFromCart,
   buyFromCart,
 } = require("../controllers/Cart");
 const cookieAuth = require("../middleware/cookieAuth");
 
 router.post("/cart/product/:productId", cookieAuth, addtoCart);
-router.get("/Cart", cookieAuth, getCart);
-router.delete("/Cart/:productId", cookieAuth, removeFromCart);
-router.post("/Cart/buy", cookieAuth, buyFromCart);
+router.get("/cart", cookieAuth, getCart);
+router.delete("/cart/:productId", cookieAuth, removeFromCart);
+router.post("/cart/buy", cookieAuth, buyFromCart);
 module.exports = router;
-
-
-  
-  
