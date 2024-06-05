@@ -220,12 +220,20 @@ exports.buyFromCart = async (req, res) => {
           message: `Insufficient stock for product ${product.name}. Available stock: ${productSize.inStock}`,
         });
       }
+      user.myorders.push({
+        name: cartItem.name,
+        productId: cartItem.productId,
+        pic: cartItem.pic, // Assuming the cart item has the pic
+        price: cartItem.price, // Assuming the cart item has the price
+        status: "pending",
+        date: new Date() // Current date as the default value
+      });
 
-      // Calculate total price
       totalPrice += product.price * cartItem.quantity;
 
       // Decrease stock quantity
       productSize.inStock -= cartItem.quantity;
+
     }
 
     // Save the changes to all products

@@ -32,6 +32,8 @@ exports.createUser = async (req, res) => {
       products: [],
       favorites: [],
       Cart: [],
+      Mysells: [],
+      myorders: [],
       salt: salt,
     });
 

@@ -14,7 +14,7 @@ const { searchFilter } = require("../controllers/productControl");
 const adminAuth = require("../middleware/adminAuth");
 
 //create admin
-router.post(`/admin/${process.env.CREATE_ADMIN}`, createAdmin);
+router.post(`/admin`, createAdmin);
 
 // admin login
 router.post(`/admin/login`,adminLogin)
