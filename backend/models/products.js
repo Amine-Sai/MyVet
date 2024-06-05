@@ -31,6 +31,7 @@ const itemSchema = new mongoose.Schema({
       "Skirt",
       "Dress",
       "Hidjeb",
+      "Jewelry",
     ], //add types if needed
     required: true,
   },

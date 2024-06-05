@@ -103,7 +103,53 @@ const userSchema = new mongoose.Schema({
       },
     },
   ],
+  Mysells: [
+    {
+      email: {
+        type: String,
+        unique: true,
+          },
+      date: {
+        type: Date,
+        default: Date.now(),
+      },
 
+      phoneNumber: {
+        type: String,
+        required: true,
+      },
+      quantity: {
+        type: Number,
+        default: 1,
+      },
+      productId: {
+        type: mongoose.Types.ObjectId,
+      },
+      
+    },
+  ],
+ myorders : [
+    {
+      name: {
+        type: String,
+      },
+      productId: {
+        type: mongoose.Types.ObjectId,
+      },
+      date: {
+        type: Date,
+        default: Date.now(),
+      },
+
+      price: {
+        type: Number,
+      },
+      status: {
+        type: String,
+        enum: ["pending", "on the way ", "shipped", "delivered", "bought"], //add types if needed
+      },
+    },
+  ],
   salt: {
     type: String,
     required: true,
