@@ -1,4 +1,4 @@
-const admin = require("../models/admin");
+const Admin = require("../models/admin");
 const User = require("../models/user");
 const Product = require("../models/products");
 const blackList = require("../models/blacklist");
@@ -83,7 +83,7 @@ exports.createAdmin = async (req, res) => {
 exports.adminLogin = async (req, res) => {
   try {
     const { email } = req.body;
-    const admin = await admin.findOne({ email: email });
+    const admin = await Admin.findOne({ email: email });
     if (!admin) return res.status(404).json({ message: "Admin not found!" });
     const { password } = req.body;
     const isValidPassword = await bcrypt.compare(password, admin.password);
@@ -92,18 +92,14 @@ exports.adminLogin = async (req, res) => {
     }
 
     // Generate the token
-    const token = jwt.sign(
-      { id: admin._id, seller: admin.isSeller },
-      process.env.JWT_TOKEN,
-      { expiresIn: "2d" }
-    );
+    const token = jwt.sign({ id: admin._id }, process.env.JWT_TOKEN, {
+      expiresIn: "1d",
+    });
 
     res.status(200).json({
       jwt: token,
       admin: {
         id: admin._id,
-        username: admin.username,
-        email: admin.email,
       },
     });
   } catch (error) {
@@ -114,6 +110,11 @@ exports.adminLogin = async (req, res) => {
 
 exports.updateProduct = async (req, res) => {
   try {
+    if (!req.userId)
+      return res.status(401).json({ message: "Not authorized." });
+
+
+      
     const update = req.body;
     const productId = req.params.productId;
 

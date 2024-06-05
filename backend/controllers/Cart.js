@@ -29,27 +29,9 @@ exports.getCart = async (req, res) => {
     );
     Carts = Carts.filter(Boolean);
 
-
-
-
-
-    let totalPrice = 0;
-
-    // Loop through each item in the user's cart
-    for (const cartItem of user.Cart) {
-      const product = await Product.findById(cartItem.productId);
-     // if (!productSize) return res.status(404).json({ message: `Size ${cartItem.colors.sizes.value} not found for product ${product.name}.` });
-      // totalPrice += product.price * cartItem.quantity;
-      
-      // Check if there is enough stock
-     // if (productSize.inStock < cartItem.quantity) {
-        //res.status(400).json({ message: `Insufficient stock for product ${product.name}. Available stock: ${productSize.inStock}` });
-      }
-
-    return res.status(200).json({ Cart: Carts ,  totalPrice :  totalPrice  });
+    return res.status(200).json({ Cart: Carts });
   } catch (error) {
-    res.status(500).json({ message: "Error occured."});
-    console.error(error);
+    res.status(500).json({ message: "Error occured." });
   }
 };
 
@@ -220,20 +202,12 @@ exports.buyFromCart = async (req, res) => {
           message: `Insufficient stock for product ${product.name}. Available stock: ${productSize.inStock}`,
         });
       }
-      user.myorders.push({
-        name: cartItem.name,
-        productId: cartItem.productId,
-        pic: cartItem.pic, // Assuming the cart item has the pic
-        price: cartItem.price, // Assuming the cart item has the price
-        status: "pending",
-        date: new Date() // Current date as the default value
-      });
 
+      // Calculate total price
       totalPrice += product.price * cartItem.quantity;
 
       // Decrease stock quantity
       productSize.inStock -= cartItem.quantity;
-
     }
 
     // Save the changes to all products

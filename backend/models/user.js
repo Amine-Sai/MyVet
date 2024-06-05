@@ -103,12 +103,12 @@ const userSchema = new mongoose.Schema({
       },
     },
   ],
-  Mysells: [
+  mySells: [
     {
       email: {
         type: String,
-        unique: true,
-          },
+        required: true,
+      },
       date: {
         type: Date,
         default: Date.now(),
@@ -125,10 +125,17 @@ const userSchema = new mongoose.Schema({
       productId: {
         type: mongoose.Types.ObjectId,
       },
-      
+      color: {
+        type: String,
+        required: true,
+      },
+      size: {
+        type: String,
+        required: true,
+      },
     },
   ],
- myorders : [
+  myOrders: [
     {
       name: {
         type: String,
@@ -140,9 +147,13 @@ const userSchema = new mongoose.Schema({
         type: Date,
         default: Date.now(),
       },
-
-      price: {
-        type: Number,
+      color: {
+        type: String,
+        required: true,
+      },
+      size: {
+        type: String,
+        required: true,
       },
       status: {
         type: String,
