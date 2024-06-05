@@ -272,6 +272,7 @@ exports.homePage = async (req, res) => {
     const Jewelry = await Product.find({
       category: { $regex: "Jewelry", $options: "i" },
     }).sort({ sold: 1 });
+    
     res.status(200).json({
       mostSold: mostSold,
       promoted: promoted,
