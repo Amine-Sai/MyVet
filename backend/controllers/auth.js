@@ -28,7 +28,7 @@ exports.createUser = async (req, res) => {
       password: hashedPassword,
       firstName: firstName,
       lastName: lastName,
-      phoneNumber: phoneNumber,
+      phoneNumber: phoneNumber || "",
       products: [],
       favorites: [],
       Cart: [],

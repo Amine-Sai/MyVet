@@ -183,20 +183,20 @@ exports.buyFromCart = async (req, res) => {
           .status(404)
           .json({ message: `Seller not found for product ${product.name}` });
       }
-      seller.mySells.push({
-        name: product.name,
-        productId: product._id,
-        pic: product.pic[0], // Assuming the product has the pic array
-        price: itemPrice,
-        status: "pending",
-        date: new Date(), // Current date as the default value
-        color: cartItem.colors[0].color,
-        size: cartItem.colors[0].sizes[0].value,
-        shoeSize: cartItem.colors[0].sizes[0].shoeSize,
-        email: user.email, // Add buyer's email
-        phoneNumber: user.phoneNumber, // Add buyer's phone number
-        quantity: cartItem.quantity,
-      });
+      // seller.mySells.push({
+      //   name: product.name,
+      //   productId: product._id,
+      //   pic: product.pic[0], // Assuming the product has the pic array
+      //   price: itemPrice,
+      //   status: "pending",
+      //   date: new Date(), // Current date as the default value
+      //   color: cartItem.colors.color,
+      //   size: cartItem.colors.sizes.value,
+      //   shoeSize: cartItem.colors.sizes.shoeSize,
+      //   email: user.email, // Add buyer's email
+      //   phoneNumber: user.phoneNumber, // Add buyer's phone number
+      //   quantity: cartItem.quantity,
+      // });
 
       // Add to myOrders
       user.myOrders.push({

@@ -68,23 +68,22 @@ exports.upgradeRequest = async (req, res) => {
   try {
     if (!req.userId)
       return res.status(401).json({ message: "you must be logged in." });
-    const user = await User.findById(req.userId);
+    let user = await User.findById(req.userId);
 
     if (!user) return res.status(404).json({ message: "User not found." });
     if (user.upgradeRequest)
       return res
         .status(409)
         .json({ message: "You've already requested an upgrade." });
-    user.upgradeRequest = true;
 
-    // const { pic } = req.body;
-    // await adminMail(user.email, user.phoneNumber, pic || "No image provided.");
+    if (user.isSeller)
+      return res.status(409).json({ message: "You're already a seller." });
+    user.upgradeRequest = true;
     await user.save();
 
-    res
-      .status(200)
-      .json({ message: "Request sent! We'll keep you updated in your email." });
+    res.status(200).json({ message: "Request sent! We'll keep you updated." });
   } catch (error) {
+    console.log(error);
     res.status(500).json({ message: "Error occurred." });
   }
 };
