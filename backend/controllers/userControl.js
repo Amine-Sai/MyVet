@@ -77,8 +77,8 @@ exports.upgradeRequest = async (req, res) => {
         .json({ message: "You've already requested an upgrade." });
     user.upgradeRequest = true;
 
-    const { pic } = req.body;
-    await adminMail(user.email, user.phoneNumber, pic || "No image provided.");
+    // const { pic } = req.body;
+    // await adminMail(user.email, user.phoneNumber, pic || "No image provided.");
     await user.save();
 
     res

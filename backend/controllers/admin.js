@@ -222,7 +222,9 @@ exports.sellerRequests = async (req, res) => {
     const users = await User.find({
       upgradeRequest: true,
       isSeller: false,
-    }).lean();
+    })
+      .select("email phoneNumber firstName lastName")
+      .lean();
     res.status(200).json({ users });
   } catch (error) {
     console.log(error);
