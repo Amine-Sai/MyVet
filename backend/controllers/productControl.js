@@ -75,7 +75,6 @@ exports.getProduct = async (req, res) => {
       const user = await User.findById(req.userId);
       if (!user)
         return res.status(401).json({ message: "Invalid token, login again" });
-      console.log(user.favorites);
       heart = user.favorites.some((favorites) => favorites.id == productId);
     }
 

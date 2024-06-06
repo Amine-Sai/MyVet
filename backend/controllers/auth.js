@@ -111,19 +111,19 @@ exports.passResetEmail = async (req, res) => {
     const { email } = req.body;
     const user = await User.findOne({ email: email });
     if (!user) return res.status(404).json({ message: "User not found." });
-    console.log(user.resetPassword.attempts);
-    if (
-      user.resetPassword.attempts < 4 ||
-      user.resetPassword.cooldown <= Date.now()
-    ) {
+
+    if (user.resetPassword.attempts < 4) {
       user.resetPassword.attempts++;
-      console.log("can reset this time");
       const resetToken = generateOTP();
       user.resetPassword.string = resetToken;
-      console.log("can reset this time", resetToken);
       user.resetPassword.expiresIn = Date.now() + 30 * 60 * 1000; // 30 minute timeout
       await emailVerification(email, resetToken);
-    } else if (user.resetPassword.attempts >= 4) {
+    } else if (
+      user.resetPassword.cooldown <= Date.now() &&
+      user.resetPassword.attempts > 3
+    ) {
+      user.resetPassword.attempts = 0;
+    } else {
       console.log("can't reset this time");
       user.resetPassword.cooldown = Date.now() + 5 * 60 * 1000; // 5 minute cooldown
     }

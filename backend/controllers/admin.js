@@ -4,6 +4,7 @@ const Product = require("../models/products");
 const blackList = require("../models/blacklist");
 const bcrypt = require("bcryptjs");
 const Math = require("mathjs");
+const jwt = require("jsonwebtoken");
 require("dotenv").config();
 
 sendMail = async (email, code) => {
@@ -218,6 +219,10 @@ exports.upgradeToSeller = async (req, res) => {
 exports.sellerRequests = async (req, res) => {
   try {
     const user = User.find({ upgradeRequest });
+    console.log(user);
     res.status(200).json({ users: user });
-  } catch (error) {}
+  } catch (error) {
+    console.log(error);
+    res.status(500).json({ message: "Error occured" });
+  }
 };
