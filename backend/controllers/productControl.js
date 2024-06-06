@@ -149,7 +149,7 @@ exports.updateProduct = async (req, res) => {
       if (prod._id == updatedProduct._id) {
         prod.name = updatedProduct.name;
         prod.price = updatedProduct.price;
-        prod.pic = updatedProduct.pic[0];
+        prod.pic = updatedProduct.pic;
       }
     }
 
