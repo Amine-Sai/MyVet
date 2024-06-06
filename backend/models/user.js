@@ -169,6 +169,7 @@ const userSchema = new mongoose.Schema({
       status: {
         type: String,
         enum: ["pending", "on the way ", "shipped", "delivered", "bought"], //add types if needed
+        default: "pending",
       },
     },
   ],
