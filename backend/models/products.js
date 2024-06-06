@@ -125,6 +125,7 @@ const itemSchema = new mongoose.Schema({
   promotion: {
     type: Number,
     default: 0,
+    max: 90,
   },
 
   sold: {
