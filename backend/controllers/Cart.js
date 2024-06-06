@@ -52,8 +52,8 @@ exports.addtoCart = async (req, res) => {
     if (!user) return res.status(404).json({ message: "User not found" });
 
     const product = await Product.findById(productId);
-    if (!product)
-      return res.status(404).json({ message: "product not found." });
+    if (!product || product.sellerid == userId)
+      return res.status(404).json({ message: "page not found." });
 
     const inCart = user.Cart.some(
       (cartItem) =>
@@ -176,11 +176,12 @@ exports.buyFromCart = async (req, res) => {
         product.price * (1 - (product.promotion || 0)) * cartItem.quantity;
       totalPrice += itemPrice;
 
-
       const seller = await User.findById(product.sellerid);
 
       if (!seller) {
-        return res.status(404).json({ message: `Seller not found for product ${product.name}` });
+        return res
+          .status(404)
+          .json({ message: `Seller not found for product ${product.name}` });
       }
       seller.mySells.push({
         name: product.name,
@@ -227,6 +228,6 @@ exports.buyFromCart = async (req, res) => {
       .json({ message: "Purchase successful", totalPrice: totalPrice });
   } catch (error) {
     console.error(error);
-    res.status(500).json({ message: "Internal server error" + error});
+    res.status(500).json({ message: "Internal server error" + error });
   }
 };

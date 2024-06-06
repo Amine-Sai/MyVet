@@ -203,7 +203,7 @@ exports.addComment = async (req, res) => {
 
     if (!req.params) return res.status(500).json({ message: "Bad request" });
 
-    const user = User.findById(req.userId);
+    let user = await User.findById(req.userId);
     if (!user) return res.status(401).json({ message: "Unauthorized." });
 
     let product = await Product.findById(req.params.productId);
@@ -213,11 +213,11 @@ exports.addComment = async (req, res) => {
     const { rating, content } = req.body;
     if (!rating) return;
     product.comments.push({
-      name: user.firstName + user.lastName,
-      date: Date.now(),
       user: req.userId,
       content: content,
       rating: rating,
+      date: Date.now(),
+      name: `${user.firstName} ${user.lastName}`,
     });
     productRating(product);
     res.status(200).json({ message: "Comment added!" });

@@ -218,9 +218,12 @@ exports.upgradeToSeller = async (req, res) => {
 
 exports.sellerRequests = async (req, res) => {
   try {
-    const user = User.find({ upgradeRequest });
-    console.log(user);
-    res.status(200).json({ users: user });
+    if (!req.userId) return res.status(401).json({ message: "Unauthorized" });
+    const users = await User.find({
+      upgradeRequest: true,
+      isSeller: false,
+    }).lean();
+    res.status(200).json({ users });
   } catch (error) {
     console.log(error);
     res.status(500).json({ message: "Error occured" });
