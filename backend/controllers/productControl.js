@@ -170,7 +170,7 @@ exports.delProduct = async (req, res) => {
       return res.status(404).json({ message: "page not found" });
 
     const { productId } = req.params;
-    const deleted = await Product.findByIdAndDelete({
+    const deleted = await Product.findOneAndDelete({
       _id: productId,
       sellerid: req.userId,
     });
