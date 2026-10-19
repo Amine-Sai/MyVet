@@ -1,2 +1,2 @@
-project of 2 nd year of preparatory class , by dennai amro and saidane amine 
-
+**A clothing e-commerce website back-end side developed as a second-year preparatory class project by Saidne Mohamed Elamine & Denai amro**
+**Live Website:** [Visit the website]([https://your-hosted-website-link.com](https://certifiedcodeboy.github.io/Myvet/))
